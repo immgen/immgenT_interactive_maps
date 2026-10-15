@@ -1,0 +1,10 @@
+lung LCMVarm_D7 I36H9
+spleen LCMVarm_D7 I36H2
+spleen dirty_2m_LCMVarm_D7 I45H8
+spleen Toxo_D23 I59H11
+spleen dirty_2m_LCMVarm_D7 I45H9
+spleen LCMVarm_intravascular I51H1
+lung LCMVarm_intravascular I51H4
+spleen LCMVarm_extravascular I50H1
+brain Toxo_D23 I59H7
+spleen dirty_2m_LCMVarm_D7 I45H10

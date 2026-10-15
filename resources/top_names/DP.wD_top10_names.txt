@@ -1,0 +1,10 @@
+spleen baseline I1H3
+spleen baseline I1H4
+mammary gland 3dpp I1H1
+mammary gland 3dpp I1H2
+skin of body B16_ACT I35H2
+colonic epithelium baseline I8H7
+uterus CtrachomatisD_primaryD5 I33H4
+spleen MHCIIKO I92H1
+uterus CtrachomatisL2_primaryD5 I33H8
+liver baseline I8H5

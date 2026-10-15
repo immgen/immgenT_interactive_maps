@@ -1,0 +1,10 @@
+spleen baseline I13H1
+spleen baseline I14H1
+pancreas D14 I99H11
+pancreas NOD_D14 I99H3
+spleen baseline I85H22
+spleen baseline I14H9
+inguinal lymph node B16_ACT I35H3
+spleen baseline I13H9
+endocrine pancreas NOD I49H7
+axillary lymph node baseline I13H7

@@ -1,0 +1,10 @@
+spleen baseline I1H3
+spleen baseline I1H4
+spleen baseline I22H1
+spleen baseline I28H1
+spleen baseline I70H0
+spleen baseline I31H1
+lung HDM I23H4
+spleen baseline I17H1
+lung baseline I23H3
+spleen baseline I20H1

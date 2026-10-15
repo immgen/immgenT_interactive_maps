@@ -1,0 +1,10 @@
+skin of back, right flank VV_D80 I46H10
+inguinal lymph node B16_ACT I35H3
+spleen 18mo I29H8
+bone marrow baseline I11H3
+spleen 18mo I29H7
+inguinal lymph node;axillary lymph node;brachial lymph node  VV_D80 I46H7
+bone marrow baseline I7H3
+spleen 12mo I29H5
+bone marrow LCMVarm_D60 I40H5
+pancreas D17 I99H5

@@ -1,0 +1,10 @@
+lung HDM_secondaryD3 I81H3
+uterus CtrachomatisD_secondaryD3 I33H6
+lung HDM_secondaryD3 I81H2
+lamina propria of mucosa of colon Crodentium I28H3
+lamina propria of mucosa of colon Crodentium I28H4
+lung MTB_49w I47H16
+lung MTB_49w I47H3
+uterus CtrachomatisD_primaryD15 I33H5
+uterus CtrachomatisD_secondaryD5 I33H7
+epithelium of small intestine LCMVarm_D60 I40H7

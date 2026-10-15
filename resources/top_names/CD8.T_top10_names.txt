@@ -1,0 +1,10 @@
+colonic epithelium baseline I20H3
+lamina propria of mucosa of colon DSS I32H2
+ileal epithelium Ddvillin_glia I31H8
+epithelium of small intestine baseline I20H5
+ileal epithelium CeDtg_glia I31H7
+colonic epithelium baseline I30H8
+colonic epithelium baseline I21H3
+lamina propria of mucosa of colon Calbicans I27H4
+epithelium of small intestine baseline I26H6
+ileal epithelium Ddvillin I31H5

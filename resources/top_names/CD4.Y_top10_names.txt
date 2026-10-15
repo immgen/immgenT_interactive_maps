@@ -1,0 +1,10 @@
+ileum lamina propria mother_E12.5 I90H3
+ileum lamina propria mother_E6.5 I90H2
+ileum lamina propria baseline I90H1
+ileum lamina propria SFB_mother_E18.5 I37H9
+lung HDM_secondaryD3 I81H3
+ileum lamina propria SFB_mother_E6.5 I37H7
+placenta E15.5 I90H14
+ileum lamina propria SFB_mother_E12.5 I37H8
+lung HDM_secondaryD3 I81H2
+ileum lamina propria mother_E18.5 I90H10

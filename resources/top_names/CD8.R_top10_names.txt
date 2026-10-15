@@ -1,0 +1,10 @@
+submandibular gland PD1KO I16H9
+submandibular gland PD1KO I16H7
+skin of body B16_ACT I35H2
+lung KP I96H17
+submandibular gland PD1KO I16H5
+lung KP I95H17
+submandibular gland PD1KO I15H9
+submandibular gland PD1KO I15H7
+submandibular gland PD1KO I16H8
+spleen LCMVcl13_D27 I48H5

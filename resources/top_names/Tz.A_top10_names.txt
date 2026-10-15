@@ -1,0 +1,10 @@
+spleen MHCIIKO I103H14
+liver baseline I88H9
+spleen MHCIIKO I103H15
+spleen MHCIIKO I102H14
+spleen MHCIIKO I102H15
+liver baseline I88H8
+spleen MHCIIKO I92H1
+kidney baseline I8H6
+liver baseline I56H9
+liver baseline I8H5

@@ -1,0 +1,10 @@
+colonic epithelium Tmuris I78H2
+colonic epithelium Tmuris I78H3
+epithelium of small intestine LCMVarm_D7 I36H7
+lamina propria of small intestine LCMVarm_D7 I36H8
+bone marrow LCMVarm_D60 I40H5
+epithelium of small intestine LCMVarm_D60 I40H7
+epithelium of small intestine baseline I26H6
+lamina propria of small intestine LCMVarm_D60 I40H8
+colonic epithelium baseline I20H3
+colonic epithelium baseline I78H6

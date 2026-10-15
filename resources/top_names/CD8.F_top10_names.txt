@@ -1,0 +1,10 @@
+inguinal lymph node B16_ACTaPD1a41BB I35H5
+inguinal lymph node;axillary lymph node;brachial lymph node  VV_D80 I46H12
+lung HDM I23H4
+axillary lymph node baseline I7H4
+lung HDM I23H5
+inguinal lymph node baseline I13H3
+mediastinal lymph node HDM_secondaryD3 I81H11
+skin of body B16_ACT I35H2
+inguinal lymph node baseline I7H6
+mediastinal lymph node HDM_secondaryD3 I81H12

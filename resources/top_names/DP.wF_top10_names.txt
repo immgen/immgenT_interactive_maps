@@ -1,0 +1,10 @@
+spleen baseline I60H1
+cervical lymph node baseline I6H7
+spleen baseline I2H3
+blood baseline I2H1
+lamina propria of mucosa of colon Foxp3mutant_D28 I74H14
+mediastinal lymph node baseline I11H7
+mediastinal lymph node flu I95H5
+axillary lymph node baseline I10H6
+axillary lymph node baseline I11H6
+axillary lymph node baseline I12H6

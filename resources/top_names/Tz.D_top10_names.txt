@@ -1,0 +1,10 @@
+skin of external ear baseline I8H3
+spleen KbDbQa1KO I22H5
+uterus SFB_mother_30dpp I39H5
+mediastinal lymph node LCMVarm_D60 I40H10
+spleen KbDbQa1KO I22H4
+lung baseline I88H11
+lung HDM_secondaryD3 I81H3
+lung Afumigatus I23H6
+lung Calbicans I27H7
+skin of external ear baseline I5H5

@@ -1,0 +1,10 @@
+inguinal lymph node;axillary lymph node baseline I67H12
+pancreas NOD_D14 I99H3
+spleen baseline I85H22
+mesenteric lymph node LCMVarm_D30 I38H6
+spleen baseline I13H1
+spleen baseline I14H1
+endocrine pancreas NOD I49H7
+bone marrow baseline I7H3
+blood baseline I7H1
+spleen baseline I11H2

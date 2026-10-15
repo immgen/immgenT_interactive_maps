@@ -1,0 +1,10 @@
+spleen baseline I85H22
+spleen NP_OVA_D7 I70H6
+lamina propria of small intestine baseline I9H10
+spleen NP_OVA_D21 I70H4
+spleen NP_OVA_D7 I70H8
+spleen NP_OVA_D7 I70H10
+spleen NP_OVA_D21 I70H1
+spleen NP_OVA_D21 I70H5
+blood baseline I7H1
+spleen MHCIIKO I91H1

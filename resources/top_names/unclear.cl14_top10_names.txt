@@ -1,0 +1,10 @@
+skin of body B16_ACT I35H2
+spleen baseline I60H1
+inguinal lymph node;axillary lymph node;brachial lymph node;cervical lymph node  baseline I68H12
+inguinal lymph node;axillary lymph node;brachial lymph node;cervical lymph node  baseline I68H3
+lamina propria of mucosa of colon Crodentium I28H3
+thymus baseline I88H7
+axillary lymph node baseline I10H6
+axillary lymph node baseline I11H6
+axillary lymph node baseline I12H6
+axillary lymph node baseline I13H7

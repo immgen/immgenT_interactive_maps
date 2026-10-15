@@ -1,0 +1,10 @@
+bone marrow baseline I7H3
+spleen baseline I85H22
+lamina propria of small intestine baseline I9H10
+spleen baseline I85H10
+spleen baseline I85H8
+spleen dirty_2m_LCMVarm_D30 I45H12
+spleen baseline I60H1
+spleen mother_E6.5 I90H12
+axillary lymph node baseline I7H4
+spleen mother_E18.5 I90H4

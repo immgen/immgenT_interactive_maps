@@ -1,0 +1,10 @@
+epithelium of small intestine baseline I8H8
+epithelium of small intestine baseline I26H6
+ileal epithelium baseline I30H6
+duodenal epithelium baseline I30H3
+duodenal epithelium baseline I30H2
+epithelium of small intestine MNVCR6 I26H10
+ileal epithelium baseline I30H7
+jejunal epithelium baseline I30H5
+epithelium of small intestine MNVCW3 I26H8
+jejunal epithelium baseline I30H4

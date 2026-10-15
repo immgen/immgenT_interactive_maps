@@ -1,0 +1,10 @@
+inguinal lymph node;axillary lymph node;brachial lymph node  VV_D80 I46H12
+pancreas NOD_D14 I99H3
+spleen VV_D80 I46H14
+inguinal lymph node B16_ACT I35H3
+inguinal lymph node;axillary lymph node;brachial lymph node  VV_D80 I46H4
+skin of body B16_ACT I35H2
+inguinal lymph node;axillary lymph node;brachial lymph node  VV_D80 I46H8
+inguinal lymph node B16_ACTaPD1a41BB I35H5
+inguinal lymph node baseline I7H6
+skin of body B16_ACTaPD1a41BB I35H4

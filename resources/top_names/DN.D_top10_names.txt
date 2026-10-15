@@ -1,0 +1,10 @@
+bone marrow LCMVarm_D7 I36H5
+skin of body B16_ACT I35H2
+bone marrow LCMVarm_D60 I40H5
+bone marrow baseline I100H14
+bone marrow LCMVarm_D30 I38H5
+bone marrow baseline I101H14
+peritoneal cavity baseline I11H10
+bone marrow baseline I7H3
+bone marrow baseline I11H3
+mammary gland 3dpp I1H1

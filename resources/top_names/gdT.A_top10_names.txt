@@ -1,0 +1,10 @@
+ileal epithelium CeDtg I31H3
+ileal epithelium CeDtg_glia I31H6
+epithelium of small intestine baseline I26H6
+epithelium of small intestine LCMVarm_D60 I40H7
+ileal epithelium baseline I30H6
+lamina propria of small intestine LCMVarm_D60 I40H8
+ileal epithelium CeDtg_glia I31H7
+ileal epithelium baseline I31H10
+epithelium of small intestine MNVCW3 I26H8
+epithelium of small intestine LCMVarm_D30 I38H7

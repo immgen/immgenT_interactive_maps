@@ -1,0 +1,10 @@
+spleen dirty_2m_LCMVarm_D30 I45H14
+spleen dirty_2m_LCMVarm_D30 I45H12
+spleen dirty_2m_LCMVarm_D30 I45H15
+spleen LCMVarm_D30 I45H2
+spleen Toxo_D23 I59H11
+spleen LCMVarm_D30 I45H6
+spleen LCMVarm_D30 I45H3
+spleen MCMV I22H6
+spleen LCMVcl13_D27 I48H7
+spleen LCMVcl13_D27 I48H5

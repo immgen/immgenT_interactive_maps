@@ -1,0 +1,10 @@
+skin of back, right flank VV_D80 I46H10
+spleen LCMVarm_D30 I45H6
+spleen LCMVarm_D30 I45H2
+spleen dirty_2m_LCMVarm_D30 I45H15
+spleen LCMVarm_D30 I45H3
+spleen dirty_2m_LCMVarm_D30 I45H14
+inguinal lymph node;axillary lymph node;brachial lymph node  VV_D80 I46H7
+spleen dirty_2m_LCMVarm_D30 I45H12
+submandibular gland LCMVarm_D30 I38H4
+inguinal lymph node B16_ACT I35H3

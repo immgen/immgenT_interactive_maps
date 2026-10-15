@@ -1,0 +1,10 @@
+skin of body B16_ACT I35H2
+inguinal lymph node B16_ACTaPD1a41BB I35H5
+inguinal lymph node B16_ACT I35H3
+skin of body B16_ACTaPD1a41BB I35H4
+skin of back, right flank VV_D80 I46H10
+lung LCMVarm_D7 I36H9
+lung KP I96H17
+spleen 27mo I29H9
+submandibular gland PD1KO I16H9
+uterus CtrachomatisD_primaryD5 I33H4

@@ -1,0 +1,10 @@
+inguinal lymph node B16_ACT I35H3
+inguinal lymph node baseline I7H6
+mediastinal lymph node LCMVarm_D30 I38H10
+endocrine pancreas NOD I49H7
+axillary lymph node baseline I7H4
+pancreas NOD_D14 I99H3
+mediastinal lymph node LCMVarm_D60 I40H10
+spleen baseline I85H22
+spleen baseline I19H9
+spleen baseline I19H1

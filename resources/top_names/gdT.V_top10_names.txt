@@ -1,0 +1,10 @@
+lung baseline I88H10
+spleen baseline I88H2
+inguinal lymph node;axillary lymph node;mesenteric lymph node  baseline I88H4
+liver baseline I88H8
+lung baseline I88H11
+inguinal lymph node;axillary lymph node;mesenteric lymph node  baseline I88H5
+spleen Mfurfur I68H16
+spleen baseline I88H3
+liver baseline I88H9
+inguinal lymph node;axillary lymph node;brachial lymph node;cervical lymph node  Mfurfur I68H10

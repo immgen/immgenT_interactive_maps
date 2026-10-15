@@ -1,0 +1,10 @@
+epithelium of small intestine baseline I8H8
+colonic epithelium baseline I8H7
+lamina propria of small intestine baseline I9H10
+epithelium of small intestine baseline I26H6
+ileal epithelium baseline I30H7
+ileal epithelium baseline I30H6
+jejunal epithelium baseline I30H5
+epithelium of small intestine baseline I80H2
+lamina propria of small intestine LCMVarm_D7 I36H8
+duodenal epithelium baseline I30H2

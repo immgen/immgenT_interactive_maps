@@ -1,0 +1,10 @@
+lung LCMVarm_D7 I36H9
+spleen dirty_2m_LCMVarm_D7 I45H8
+spleen dirty_2m_LCMVarm_D7 I45H9
+spleen LCMVarm_D7 I36H2
+spleen LCMVcl13_D8 I48H4
+spleen LCMVcl13_D8 I48H2
+spleen LCMVcl13_D8 I48H3
+spleen LCMVarm_intravascular I51H1
+skin of body B16_ACT I35H2
+spleen dirty_2m_LCMVarm_D7 I45H10

@@ -1,0 +1,10 @@
+colonic epithelium baseline I8H7
+bone marrow baseline I7H3
+lamina propria of mucosa of colon baseline I9H9
+bone marrow baseline I100H14
+bone marrow LCMVarm_D7 I36H5
+bone marrow baseline I101H14
+lamina propria of mucosa of colon baseline I100H16
+bone marrow baseline I11H3
+bone marrow LCMVarm_D60 I40H5
+skin of body B16_ACT I35H2

@@ -1,0 +1,10 @@
+inguinal lymph node;axillary lymph node;mesenteric lymph node  baseline I88H5
+inguinal lymph node;axillary lymph node;mesenteric lymph node  baseline I88H4
+spleen baseline I88H3
+spleen baseline I88H2
+liver baseline I88H9
+liver baseline I56H9
+lung baseline I88H11
+spleen D3 I24H2
+liver baseline I88H8
+endocrine pancreas NOD I49H7

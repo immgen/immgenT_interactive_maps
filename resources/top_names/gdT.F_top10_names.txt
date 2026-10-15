@@ -1,0 +1,10 @@
+ileal epithelium Ddvillin I31H4
+ileal epithelium Ddvillin I31H5
+ileal epithelium Ddvillin_glia I31H9
+ileal epithelium Ddvillin_glia I31H8
+epithelium of small intestine baseline I20H5
+epithelium of small intestine baseline I20H4
+ileal epithelium CeDtg I31H2
+ileal epithelium CeDtg_glia I31H7
+epithelium of small intestine baseline I26H6
+ileal epithelium CeDtg_glia I31H6

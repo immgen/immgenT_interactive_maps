@@ -1,0 +1,10 @@
+inguinal lymph node B16_ACTaPD1a41BB I35H5
+inguinal lymph node B16_ACT I35H3
+inguinal lymph node baseline I14H3
+lamina propria of mucosa of colon DSS I25H3
+mediastinal lymph node baseline I11H7
+mediastinal lymph node HDM_secondaryD30 I52H12
+mesenteric lymph node baseline I27H8
+mesenteric lymph node LCMVarm_D30 I38H6
+skin of body B16_ACT I35H2
+spleen D12 I24H4

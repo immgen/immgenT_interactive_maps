@@ -1,0 +1,10 @@
+inguinal lymph node;axillary lymph node baseline I67H12
+inguinal lymph node B16_ACTaPD1a41BB I35H5
+spleen NOD I49H3
+spleen NOD I49H2
+brain GBMmes_aPD1aCTLA4 I69H4
+spleen MHCIIKO I103H15
+spleen MHCIIKO I102H14
+spleen MHCIIKO I102H15
+skin of body B16_ACT I35H2
+spleen MHCIIKO I103H14

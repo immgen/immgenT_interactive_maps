@@ -1,0 +1,10 @@
+skin of body B16_ACT I35H2
+inguinal lymph node;axillary lymph node baseline I67H12
+spleen NP_OVA_D7 I70H6
+lamina propria of small intestine baseline I9H10
+lamina propria of small intestine baseline I100H15
+lamina propria of small intestine baseline I20H9
+brain GBMmes_aPD1aCTLA4 I69H4
+lamina propria of small intestine baseline I20H8
+inguinal lymph node B16_ACTaPD1a41BB I35H5
+lamina propria of small intestine baseline I101H15

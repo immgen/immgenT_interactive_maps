@@ -1,0 +1,10 @@
+pancreas D14 I99H11
+pancreas NOD_D14 I99H3
+mesenteric lymph node LCMVarm_D30 I38H6
+spleen baseline I85H22
+inguinal lymph node B16_ACT I35H3
+spleen CD1dKO I103H1
+spleen MHCIIhet I103H12
+spleen CD1dKO I103H4
+mesenteric lymph node LCMVarm_D7 I36H6
+endocrine pancreas NOD I49H7

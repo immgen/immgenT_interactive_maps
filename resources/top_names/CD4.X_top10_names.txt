@@ -1,0 +1,10 @@
+lung HDM_secondaryD3 I81H3
+lamina propria of mucosa of colon SFB_mother_30dpp I37H5
+lamina propria of mucosa of colon SFB_mother_E6.5 I37H2
+lamina propria of mucosa of colon SFB I37H1
+lung HDM_secondaryD3 I81H2
+lamina propria of mucosa of colon SFB_mother_E12.5 I37H6
+lung HDM_secondaryD3 I81H8
+decidua SFB_mother_E12.5 I39H3
+ileum lamina propria mother_E6.5 I90H2
+lamina propria of mucosa of colon SFB_mother_E18.5 I37H4

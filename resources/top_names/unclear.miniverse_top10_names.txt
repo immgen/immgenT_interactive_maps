@@ -1,0 +1,10 @@
+spleen NP_OVA_D7 I70H8
+spleen NP_OVA_D7 I70H9
+thymus baseline I17H4
+thymus baseline I18H2
+thymus baseline I18H4
+thymus baseline I17H2
+inguinal lymph node baseline I7H6
+thymus baseline I17H5
+lamina propria of mucosa of colon baseline I9H9
+colonic epithelium baseline I8H7

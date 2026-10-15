@@ -1,0 +1,10 @@
+spleen LCMVcl13_D60 I48H9
+spleen LCMVcl13_D60 I48H10
+lung HDM_secondaryD3 I81H3
+peritoneal cavity baseline I11H10
+spleen LCMVarm_D7 I36H2
+spleen NOD I49H3
+spleen LCMVcl13_D27 I48H5
+endocrine pancreas NOD I49H7
+spleen LCMVcl13_D27 I48H7
+spleen NP_OVA_D7 I70H8

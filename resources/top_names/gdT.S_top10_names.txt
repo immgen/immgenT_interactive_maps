@@ -1,0 +1,10 @@
+lamina propria of mucosa of colon baseline I20H7
+lamina propria of small intestine baseline I20H8
+lamina propria of mucosa of colon baseline I28H2
+lamina propria of small intestine baseline I20H9
+submandibular gland LCMVarm_D30 I38H4
+lung baseline I88H11
+lamina propria of small intestine baseline I9H10
+lamina propria of small intestine baseline I21H8
+uterus SFB_mother_30dpp I39H5
+lamina propria of small intestine MNVCR6 I26H4

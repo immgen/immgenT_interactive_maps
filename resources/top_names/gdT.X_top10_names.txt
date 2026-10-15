@@ -1,0 +1,10 @@
+lung HDM_secondaryD3 I81H8
+lung HDM_primaryD5 I81H14
+lung HDM_secondaryD3 I81H3
+lung HDM_secondaryD3 I81H9
+decidua SFB_mother_E12.5 I39H3
+lamina propria of mucosa of colon Foxp3mutant_D28 I74H14
+lung Afumigatus I23H7
+lung baseline I27H5
+lung Calbicans I27H7
+lung HDM_secondaryD3 I81H2

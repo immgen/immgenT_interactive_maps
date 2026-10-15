@@ -1,0 +1,10 @@
+skin of body B16_ACT I35H2
+bone marrow baseline I11H3
+bone marrow LCMVarm_D60 I40H5
+lamina propria of mucosa of colon baseline I28H2
+spleen KbDbQa1KO I22H5
+peritoneal cavity baseline I11H10
+spleen D3 I24H2
+spleen KbDbQa1KO I22H4
+bone marrow baseline I12H3
+bone marrow LCMVarm_D30 I38H5

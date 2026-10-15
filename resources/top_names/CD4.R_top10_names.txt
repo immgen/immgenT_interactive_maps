@@ -1,0 +1,10 @@
+lung LCMVarm_D7 I36H9
+spleen Toxo_D23 I59H10
+lamina propria of mucosa of colon Crodentium I28H4
+mediastinal lymph node LCMVarm_D7 I36H10
+brain Toxo_D23 I59H6
+uterus CtrachomatisD_secondaryD5 I33H7
+liver baseline I3H9
+spleen Toxo_D9 I59H3
+lamina propria of mucosa of colon Crodentium I28H3
+lung MTB_3w I66H7

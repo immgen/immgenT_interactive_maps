@@ -1,0 +1,10 @@
+spleen baseline I1H4
+spleen baseline I1H3
+mammary gland 3dpp I1H1
+mammary gland 3dpp I1H2
+axillary lymph node baseline I13H7
+ileal epithelium CeDtg_glia I31H7
+ileal epithelium Ddvillin I31H4
+ileal epithelium CeDtg I31H3
+mesenteric lymph node LCMVarm_D30 I38H6
+colonic epithelium Tmuris I78H2

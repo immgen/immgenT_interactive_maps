@@ -1,0 +1,10 @@
+lung baseline I8H4
+lung baseline I100H12
+lung baseline I101H12
+spleen MHCIIKO_Ea16 I103H13
+blood baseline I7H1
+pancreas NOD_D14 I99H3
+liver baseline I8H5
+lung baseline I3H5
+lung baseline I3H6
+liver baseline I101H13

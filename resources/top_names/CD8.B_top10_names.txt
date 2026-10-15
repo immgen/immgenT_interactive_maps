@@ -1,0 +1,10 @@
+lung baseline I8H4
+lung baseline I100H12
+liver baseline I8H5
+lung baseline I101H12
+bone marrow baseline I7H3
+lung baseline I3H5
+lung baseline I23H2
+liver baseline I3H9
+blood baseline I7H1
+kidney baseline I8H6

@@ -1,0 +1,10 @@
+spleen MHCIIKO_Ea16 I91H9
+spleen MHCIIhet_Ea16 I91H5
+spleen MHCIIhet_Ea16 I92H5
+spleen MHCIIhet I91H2
+spleen MHCIIKO_Ea16 I92H9
+spleen MHCIIhet_Ea16 I91H10
+spleen MHCIIhet_Ea16 I92H10
+spleen MHCIIKO_Ea16 I91H3
+spleen MHCIIhet I91H4
+spleen MHCIIhet I92H7

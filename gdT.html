@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive UMAP and Mouse Organ Map</title>
+    <!-- Using Tailwind CSS for styling the layout and UI elements -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        function handleAutoScale() {
+            if (window.devicePixelRatio > 1.1) {
+                // Apply scaling for high DPI displays
+                document.body.style.transform = 'scale(0.8)';
+                document.body.style.transformOrigin = 'top left';
+                document.body.style.width = '125%';
+                document.body.style.height = '125%';
+                document.body.classList.add('auto-scaled');
+            } else {
+                // Revert to normal for standard displays
+                document.body.style.transform = '';
+                document.body.style.transformOrigin = '';
+                document.body.style.width = '';
+                document.body.style.height = '';
+                document.body.classList.remove('auto-scaled');
+            }
+        }
+
+        // Apply scaling when the page loads
+        window.addEventListener('load', handleAutoScale);
+        
+        // Re-apply scaling if the window is resized
+        window.addEventListener('resize', handleAutoScale);
+        
+        // Re-apply scaling when moving between displays with different DPIs
+        if (window.matchMedia) {
+            const mediaQuery = window.matchMedia('(min-resolution: 120dpi)');
+            mediaQuery.addListener(handleAutoScale);
+        }
+    </script>
+    <style>
+        /* Using the Inter font from Google Fonts for a clean look */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+        }
+
+        /* --- UMAP Plot (Left Panel) Styles --- */
+        #umap-container-div {
+            position: relative;
+            width: 100%;
+            height: 60vh; /* Responsive height */
+            min-height: 350px;
+            max-height: 70vh;
+            background-size: contain;
+            background-position: center center;
+            background-repeat: no-repeat;
+            transition: background-image 0.1s ease;
+        }
+        
+        /* High DPI display adjustments for UMAP plot */
+        @media (min-resolution: 2dppx), (min-device-pixel-ratio: 2) {
+            #umap-container-div {
+                height: 75vh; /* Increase height on high DPI displays */
+                min-height: 450px; /* Increase minimum height */
+                max-height: 85vh; /* Increase maximum height */
+            }
+        }
+        
+        /* Additional adjustments for very high DPI displays */
+        @media (min-resolution: 3dppx), (min-device-pixel-ratio: 3) {
+            #umap-container-div {
+                height: 80vh;
+                min-height: 500px;
+                max-height: 90vh;
+            }
+        }
+
+        #umap-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        #umap-svg .umap-region {
+            fill: transparent;
+            cursor: pointer;
+            pointer-events: all;
+            transition: stroke 0.3s;
+        }
+               
+        .legend-item {
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            width: 98%;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+        
+        .legend-item:hover {
+            background-color: #e2e8f0;
+        }
+
+        /* --- Mouse Plot (Right Panel) Styles --- */
+        #mouse-container {
+            width: 100%;
+            height: 100%;
+            margin: 0 auto;
+            padding-left: 8px;
+            padding-right: 8px;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #mouse-svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+            /* Responsive height adjustments */
+            min-height: 200px;
+            max-height: 100%;
+        }
+        
+        /* Additional responsive breakpoints for mouse SVG */
+        @media (max-height: 800px) {
+            #mouse-svg {
+                min-height: 150px;
+            }
+        }
+        
+        @media (max-height: 600px) {
+            #mouse-svg {
+                min-height: 120px;
+            }
+        }
+        
+        /* High DPI display adjustments for mouse SVG */
+        @media (min-resolution: 2dppx), (min-device-pixel-ratio: 2) {
+            #mouse-svg {
+                min-height: 250px; /* Increase minimum height on high DPI displays */
+            }
+        }
+        
+        @media (min-resolution: 3dppx), (min-device-pixel-ratio: 3) {
+            #mouse-svg {
+                min-height: 300px; /* Further increase for very high DPI displays */
+            }
+        }
+        
+        #mouse-svg .mouse-organ-region {
+            cursor: pointer;
+            stroke: #4a5568;
+            stroke-width: 0.5px;
+            pointer-events: auto;
+            transition: fill 0.1s ease-in-out;
+        }
+
+        #mouse-svg .organ-label {
+            font-size: 9px;
+            font-weight: bold;
+            pointer-events: none;
+            transition: fill 0.1s ease-in-out;
+            text-anchor: start;
+        }
+        
+        #mouse-svg .organ-line {
+            stroke-width: 1px;
+            pointer-events: none;
+            transition: stroke 0.1s ease-in-out;
+        }
+
+        /* --- Tooltip Styles --- */
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            white-space: nowrap;
+            pointer-events: none;
+            display: none;
+            z-index: 9999;
+        }
+
+        .legend-item.legend-item-hover {
+            background-color: #cbd5e1 !important;
+            box-shadow: 0 0 0 2px #64748b;
+        }
+
+        /* --- SELECTED LEGEND ITEM STYLE --- */
+        .legend-item.legend-item-selected {
+            background-color: #fbbf24 !important; /* Amber-400 */
+            box-shadow: 0 0 0 2px #b45309;
+            border: 2px solid #b45309;
+        }
+
+        /* Auto-scaling styles for high DPI displays */
+        .auto-scaled {
+            transform-origin: top left;
+            transition: transform 0s ease;
+        }
+
+        /* Lock overlay for small screens */
+        .lock-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .lock-overlay .lock-content {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            max-width: 400px;
+        }
+
+        .lock-overlay h2 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 16px;
+            color: #fbbf24;
+        }
+
+        .lock-overlay p {
+            font-size: 1rem;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+
+        .lock-overlay .icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: #fbbf24;
+        }
+
+        /* Prevent scrolling when locked */
+        body.locked {
+            overflow: hidden !important;
+        }
+
+
+        /* --- UMAP Legend Styles --- */
+        #umap-legend {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto 8px auto;
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr)); /* 5 columns as requested */
+            gap: 6px 10px;
+        }
+        @media (max-width: 1400px) {
+            header h1 {
+                font-size: 1.5rem !important; /* Smaller header for screens < 1400px */
+            }
+        }
+        @media (max-width: 1300px) {
+            #umap-legend {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+        }
+        @media (max-width: 1000px) {
+            #umap-legend {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        #umap-legend .legend-item {
+            font-size: 0.75rem;         /* Smaller font (12px) */
+            padding: 2px 4px;           /* Less padding */
+            margin: 0;                  /* Remove extra margin */
+            min-height: unset;
+            height: 22px;               /* Compact height */
+        }
+        #umap-legend .legend-item .w-4, 
+        #umap-legend .legend-item .h-4 {
+            width: 14px !important;     /* Smaller color box */
+            height: 14px !important;
+            min-width: 14px;
+            min-height: 14px;
+            margin-right: 4px;
+        }
+        #umap-legend {
+            gap: 2px 6px !important;    /* Tighter grid gap */
+        }
+
+        /* Volcano plot download button: always fit and wrap */
+        #volcano-content a {
+            max-width: 100%;
+            white-space: normal;
+            word-break: break-all;
+            text-align: center;
+            display: block;
+        }
+        
+        /* Table panel: reduce font size for Top10 Sample Names on small/high-DPI screens */
+        @media (max-width: 1400px) {
+            #table-content .bg-blue-100 {
+                font-size: 0.75rem !important; /* 12px */
+                padding: 2px 6px !important;
+                margin-bottom: 1px !important;
+            }
+            #table-panel h2 {
+                font-size: 1rem !important;
+            }
+            /* Make all panel titles (h2) smaller */
+            .bg-white h2 {
+                font-size: 1rem !important;
+            }
+            /* Make cluster legend labels smaller */
+            #umap-legend .legend-item .text-sm {
+                font-size: 0.75rem !important;
+            }
+            #umap-legend .legend-item {
+                height: 18px !important;
+            }
+            /* Make mouse organ legend labels smaller */
+            #organ-legend span.text-xs {
+                font-size: 0.65rem !important;
+            }
+        }
+        
+        .download-icon-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: none;
+            padding: 2px;
+            color: #2563eb;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .download-icon-btn:hover {
+            background: #e0e7ff;
+        }
+        .download-icon-btn svg {
+            width: 22px;
+            height: 22px;
+            display: block;
+        }
+
+        /* Organ legend as vertical layout on the right */
+        #organ-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            min-width: 80px;
+            max-width: 120px;
+        }
+        #organ-legend > div {
+            justify-content: flex-start;
+            align-items: flex-start;
+        }
+        #organ-legend .text-xs {
+            font-size: 0.75rem;
+            line-height: 1;
+        }
+        
+        /* Responsive adjustments for organ legend */
+        @media (max-width: 1400px), (max-width: 2000px) and (min-resolution: 2dppx), (max-width: 2000px) and (min-device-pixel-ratio: 2) {
+            #organ-legend {
+                min-width: 70px;
+                max-width: 100px;
+            }
+            #organ-legend .text-xs {
+                font-size: 0.65rem !important;
+            }
+        }
+
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <!-- Lock overlay for small screens -->
+    <div id="lock-overlay" class="lock-overlay" style="display: none;">
+        <div class="lock-content">
+            <div class="icon">🔒</div>
+            <h2>Screen Too Small</h2>
+            <p>This interactive visualization requires a minimum screen width of 1000px and height of 600px.</p>
+            <p>Please resize your browser window or use a larger screen to access the full functionality.</p>
+        </div>
+    </div>
+
+    <div id="tooltip" class="tooltip"></div>
+
+    <div class="w-full p-2 h-full flex flex-col">
+        <header class="text-center mb-4">
+            <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900">immgenT Cell Clusters and Organs Interactive Maps (gdT)</h1>            
+        </header>
+
+        <div class="flex flex-col md:flex-row gap-4 flex-1 min-h-0 h-full justify-center items-start">
+            
+            <!-- Left Panel: UMAP Plot and Legend -->
+            <div class="w-full md:w-2/5 bg-white p-1 rounded-lg shadow-lg flex flex-col gap-2 min-h-0 h-full ml-2 mb-2">
+                <h2 class="text-xl font-bold mb-4 text-center">Gamma-delta T-cells MDE</h2>
+                <!-- UMAP Legend -->
+                <div class="w-full">
+                    <div id="umap-legend" class="grid grid-cols-4 md:grid-cols-6 gap-x-2 gap-y-1">
+                       <!-- Legend items will be injected here by script -->
+                    </div>
+               </div>
+                <!-- UMAP Plot -->
+                <div class="w-full flex-1 flex flex-col items-center justify-center min-h-0">
+                    
+                    <div id="umap-container-div">
+                        <svg id="umap-svg" viewBox="30 30 897 897" preserveAspectRatio="xMidYMid meet">
+                           <!-- UMAP regions from gdTClusters.html -->
+                            <g class="umap-region" data-bg="gdT.B_points_geom.png" data-tooltip="gdT.B" id="gdT.B"><path d="M469.1,360h10.9v10.9h-10.9v-10.9ZM490.9,370.9h10.9v-10.9h-10.9v10.9ZM512.7,447.3h10.9v-10.9h-10.9v10.9ZM610.9,458.2h10.9v-10.9h-10.9v10.9ZM621.8,436.4h10.9v-10.9h-10.9v10.9ZM643.6,349.1v-10.9h-10.9v-10.9h-10.9v6s0,0,0,0v-16.9h-32.7v6.8h0v-6.8h-10.9v-10.9h-10.9v27.9h0v-17h-10.9v10.9h-10.9v-10.9h-21.8v23.1s0,0,0,0v-12.2h-10.9v10.9h-10.9v32.7h10.9v21.8h10.9v-10.7h0v21.6h7.3s-7.3,0-7.3,0v10.9h10.9v10.9h0v21.8h10.9v-10.9h10.9v10.9h10.9v-21.8h0v-.6h0v.6h0v10.9h21.8v-6.2s0,0,0,0v17.1h32.7v-21.8h0v-20.2s0,0,0,0v9.3h10.9v-10.9h-7.4s7.4,0,7.4,0v-21.8h10.9v-21.8h-10.9v-10.9h10.9Z"></path></g>
+                            <g class="umap-region" data-bg="gdT.A_points_geom.png" data-tooltip="gdT.A" id="gdT.A"><path d="M414.5,490.9h10.9v10.9h-10.9v-10.9ZM523.6,480h10.9v-10.9h-10.9v10.9ZM523.6,414.5v4.3s0,0,0,0v-15.2h-6.8s6.8,0,6.8,0v-10.9h-10.9v-21.8h-10.9v11.2s0,0,0,0v-11.2h-32.7v25.1s0,0,0,0v-3.3h-21.8v10.9h4s-4,0-4,0v21.8h0v.2h0v-.2h0v-10.9h-21.8v10.9h0v21.8h5.9s-5.9,0-5.9,0v21.8h3.8s0,0,0,0h-3.8v10.9h10.9v10.9h10.9v-19.8h0v8.8h10.9v10.9h10.9v-6.7h0v6.7h10.9v10.9h10.9v-10.9h10.9v-12.4h0v12.4h21.8v-21.8h-6.7s6.7,0,6.7,0v-14.8s0,0,0,0v3.9h10.9v-10.9h-4.5s0,0,0,0h4.5v-21.8h0v-10.9h-10.9Z"></path></g>
+                            <g class="umap-region" data-bg="gdT.V_points_geom.png" data-tooltip="gdT.V" id="gdT.V"><path d="M349.1,316.4h-10.9v-10.9h0v-21.8h21.8v21.8h0v10.9h-10.9ZM360,349.1h10.9v-10.9h-10.9v10.9ZM381.8,360h-10.9v10.9h-10.9v-10.9h-10.9v21.8h-10.9v-43.6h10.9v-10.9h-10.9v-10.9h-10.9v21.8h-10.9v10.9h10.9v43.6h43.6v10.9h10.9v-10.9h21.8v-32.7h-21.8ZM392.7,294.5h-10.9v10.9h10.9v-10.9ZM425.5,349.1h-10.9v21.8h-10.9v21.8h10.9v10.9h10.9v-10.9h21.8v-32.7h-10.9v-10.9h-10.9ZM425.5,316.4v10.9h21.8v-10.9h-21.8ZM436.4,349.1h10.9v-10.9h-10.9v10.9ZM458.2,338.2v-10.9h-10.9v54.6h10.9v-10.9h10.9v-21.8h-10.9v-10.9ZM469.1,392.7v-10.9h-10.9v10.9h10.9ZM469.1,349.1v10.9h10.9v10.9h10.9v-21.8h-21.8ZM490.9,338.2v10.9h10.9v-10.9h-10.9Z"></path></g>
+                            <g class="umap-region" data-bg="gdT.Z_points_geom.png" data-tooltip="gdT.Z" id="gdT.Z"><path d="M523.6,632.7h10.9v10.9h-10.9v-10.9ZM545.5,654.5h10.9v-10.9h-10.9v10.9ZM556.4,578.2v-10.9h-10.9v21.8h10.9v-10.9ZM567.3,556.4h-10.9v10.9h10.9v-10.9ZM589.1,589.1h-10.9v10.9h10.9v-10.9ZM610.9,610.9h10.9v-10.9h-21.8v21.8h10.9v-10.9ZM632.7,610.9h-10.9v10.9h10.9v-10.9ZM665.5,698.2h10.9v-10.9h-10.9v10.9ZM665.5,665.5v-21.8h-15.6s0,0,0,0h4.7v-10.9h-10.9v2.4s0,0,0,0v-13.3h-21.8v7.4h0v-7.4h-32.7v1.9h0v-1.9h-2s0,0,0,0h2v-10.9h-10.9v-10.9h-10.9v6.9s0,0,0,0v-17.8h-10.9v10.9h-10.9v21.8h8.4s-8.4,0-8.4,0h-10.9v10.9h21.8v10.9h10.9v-6.1s0,0,0,0v6.1h9.4s-9.4,0-9.4,0v10.9h10.9v10.9h10.9v-14.7s0,0,0,0v14.7h32.7v-7.1h0v7.1h0v10.9h21.8v-4.3s0,0,0,0v15.2h32.7v-21.8h-10.9Z"></path></g>
+                            <g class="umap-region" data-bg="gdT.R_points_geom.png" data-tooltip="gdT.R" id="gdT.R"><polygon points="305.5 316.4 305.5 305.5 294.6 305.5 294.6 294.5 294.6 283.6 283.6 283.6 272.7 283.6 272.7 272.7 272.7 261.8 261.8 261.8 261.8 272.7 250.9 272.7 250.9 283.6 240 283.6 240 294.5 240 305.5 240 305.5 240 316.4 240 327.3 250.9 327.3 250.9 338.2 261.8 338.2 272.7 338.2 283.6 338.2 294.5 338.2 294.6 338.2 305.5 338.2 305.5 327.3 316.4 327.3 316.4 316.4 305.5 316.4"></polygon></g>
+                            <g class="umap-region" data-bg="gdT.S_points_geom.png" data-tooltip="gdT.S" id="gdT.S"><polygon points="338.2 261.8 327.3 261.8 327.3 250.9 316.4 250.9 316.4 240 305.5 240 305.5 240 294.6 240 294.6 229.1 283.6 229.1 283.6 240 283.6 250.9 272.7 250.9 272.7 261.8 272.7 272.7 272.7 283.6 283.6 283.6 294.5 283.6 294.5 294.5 294.5 305.5 305.5 305.5 305.5 316.4 316.4 316.4 316.4 327.3 327.3 327.3 327.3 316.4 338.2 316.4 338.2 305.5 338.2 305.5 338.2 294.5 338.2 283.6 349.1 283.6 349.1 272.7 349.1 261.8 338.2 261.8"></polygon></g>
+                            <g class="umap-region" data-bg="gdT.C_points_geom.png" data-tooltip="gdT.C" id="gdT.C"><path d="M556.4,447.3h-10.9v-10.9h10.9v10.9ZM632.7,436.4h-10.9v10.9h10.9v-10.9ZM654.5,469.1h-10.9v6.5s0,0,0,0v-6.5h-13s2.1,0,2.1,0h10.9v-10.9h-21.8v4.1h0v-4.1h-10.9v-10.9h-21.8v3.9h0v-3.9h-10.3s10.3,0,10.3,0v-10.9h-21.8v8.1c-.2.5-.4,1-.5,1.6,0,.4,0,.8-.1,1.2h-32.2v10.9h-10.9v10.9h14.8s-3.9,0-3.9,0v10.9h-10.9v21.8h2.3s-2.3,0-2.3,0v10.9h4.9c.2.3.4.5.7.7,1.3.9,2.7.3,4.1-.7h12.2v10.9h5.8s0,0,0,0h-5.8v10.9h10.9v-10.9h-2s0,0,0,0h12.9v-21.8h-5.6s0,0,0,0h5.6v-5.8h0v5.8h21.8v-4.9h0v4.9h4.7s-4.7,0-4.7,0v10.9h10.9v-10.9h-.3s.3,0,.3,0h21.8v-12.9h0v2h21.8v-6.5h0v6.5h10.9v-10.9h10.9v-10.9h-10.9Z"></path></g>
+                            <g class="umap-region" data-bg="gdT.F_points_geom.png" data-tooltip="gdT.F" id="gdT.F"><path d="M360,589.1v10.9h-10.9v-10.9h10.9ZM360,578.2h-10.9v10.9h10.9v-10.9ZM360,600v10.9h10.9v-10.9h-10.9ZM512.7,643.6v-10.9h-10.9v2.3h0v-13.2h-4.9s0,0,0,0h4.9v-5.1s0,0,0,0v5.1h10.9v-21.8h-10.9v4.2h0v-4.2h-10.9v10.9h-21.8v4h0v-14.9h-21.8v14.2h0v-3.2h-21.8v-21.8h-10.9v21.8h-10.9v4.1h0v-4.1h-10.9v-10.9h-10.9v10.9h-10.9v10.9h1s-1,0-1,0v10.9h10.9v10.9h5.1s-5.1,0-5.1,0v21.8h0v10.9h10.9v10.9h10.9v-3.4h0v3.4h1.6s-1.6,0-1.6,0v10.9h10.9v10.9h4.9s-4.9,0-4.9,0v10.9h32.7v-4.5s0,0,0,0v15.4h21.8v-3.9h0v14.8h10.9v-21.8h21.8v-10.9h-7.7s7.7,0,7.7,0v-21.8h-5.7s0,0,0,0h5.7v-10.7c.8,0,1.6-.1,2.3-.2h8.6v-10.9h10.9v-21.8h-15.5s4.6,0,4.6,0ZM523.6,621.8h-10.9v10.9h10.9v-10.9Z"></path></g>
+                            <g class="umap-region" data-bg="gdT.G_points_geom.png" data-tooltip="gdT.G" id="gdT.G"><polygon points="305.5 567.3 305.5 556.4 316.4 556.4 316.4 545.5 327.3 545.5 327.3 534.5 316.4 534.5 316.4 545.5 305.5 545.5 305.5 534.5 294.6 534.5 294.5 534.5 283.6 534.5 272.7 534.5 261.8 534.5 250.9 534.5 250.9 545.5 250.9 545.5 250.9 556.4 240 556.4 240 567.3 243 567.3 243 567.3 240 567.3 240 578.2 250.9 578.2 250.9 589.1 261.8 589.1 272.7 589.1 283.6 589.1 283.6 578.2 294.5 578.2 294.5 589.1 305.5 589.1 305.5 578.2 316.4 578.2 316.4 578.2 327.3 578.2 327.3 567.3 316.4 567.3 316.4 567.3 305.5 567.3 305.5 567.3 305.5 567.3 305.5 567.3"></polygon></g>
+                            <g class="umap-region" data-bg="gdT.Q_points_geom.png" data-tooltip="gdT.Q" id="gdT.Q"><polygon points="327.3 338.2 327.3 327.3 316.4 327.3 316.4 327.3 305.5 327.3 305.5 338.2 294.6 338.2 294.5 338.2 283.6 338.2 272.7 338.2 261.8 338.2 261.8 349.1 261.8 360 261.8 370.9 272.7 370.9 272.7 381.8 272.7 392.7 272.7 403.6 283.6 403.6 283.6 392.7 294.5 392.7 294.6 392.7 305.5 392.7 305.5 392.7 316.4 392.7 316.4 392.7 327.3 392.7 327.3 381.8 327.3 370.9 327.3 360 327.3 349.1 316.4 349.1 316.4 338.2 327.3 338.2"></polygon></g>
+                            <g class="umap-region" data-bg="gdT.E_points_geom.png" data-tooltip="gdT.E" id="gdT.E"><path d="M709.1,534.5h10.9v10.9h-10.9v-10.9ZM752.7,534.5h10.9v-10.9h-10.9v10.9ZM752.7,501.8h-6.8s0,0,0,0h6.8v-10.9h-10.9v4.9s0,0,0,0v-26.8h-10.9v10.9h-10.9v10.9h-10.9v10.9h3.4,0s-3.4,0-3.4,0v21.8h10.5c.1.2.3.5.4.7v10.2h21.8v-10.9h-7.1s0,0,0,0h7.1v-1.9h0v1.9h21.8v-21.8h-10.9ZM698.2,534.3v-10.7h-10.9v4.8h0v-4.8h-10.9v18.8h-5.5v13.9h-5.5v10.9h5.5s21.8,0,21.8,0h0s5.5,0,5.5,0h10.9v-21.8h0v-10.9h-10.6c-.1,0-.2-.2-.3-.2Z"></path></g>
+                            <g class="umap-region" data-bg="gdT.J_points_geom.png" data-tooltip="gdT.J" id="gdT.J"><path d="M299.6,560.1h24.9v17.6h-27.5v-12.7h-17.6v-17.9h20.2v13ZM330.7,667v26.5h31.7v-26.5h-31.7Z"></path></g>
+                            <g class="umap-region" data-bg="gdT.D_points_geom.png" data-tooltip="gdT.D" id="gdT.D"><path d="M643.6,360h-10.9v-10.9h10.9v10.9ZM730.9,458.2v-10.9h-3.6s3.6,0,3.6,0v-10.9h-10.9v-10.9h0v-21.8h-10.9v7.7s0,0,0,0v-7.7h-7.1,0s7.1,0,7.1,0v-10.9h-10.9v-21.8h-10.9v6.1h0v-17h-21.8v-10.9h-10.9v-10.9h-10.9v47.6h0v-4h-10.9v21.8h5.6s-5.6,0-5.6,0v10.9h-10.9v10.9h10.9v21.8h5.7s-5.7,0-5.7,0h-10.9v10.9h21.8v-6h0v16.9h28.1s-6.3,0-6.3,0v10.9h10.9v10.9h10.9v-6.6h0v6.6h21.8v-7.1h0s0,7.1,0,7.1h10.9v-10.9h10.9v-10.9h-4.7s4.7,0,4.7,0h10.9v-10.9h-10.9Z"></path></g>
+                            <g class="umap-region" data-bg="gdT.I_points_geom.png" data-tooltip="gdT.I" id="gdT.I"><path d="M294.6,589.1h-10.9v-10.9h10.9v10.9ZM349.1,545.5h-10.9v10.9h10.9v-10.9ZM381.8,665.5v10.9h-43.6v-10.9h-21.8v10.9h-10.9v-10.9h-43.6v-10.9h10.9v-10.9h3.2s-3.2,0-3.2,0v-21.8h3.8s-3.8,0-3.8,0v-10.9h21.8v-21.8h13.2s-2.3,0-2.3,0v-10.9h21.8v-10.9h10.9v10.9h10.9v10.9h-5.8s5.8,0,5.8,0v10.9h10.9v10.9h10.9v10.9h-8.8s8.8,0,8.8,0v10.9h10.9v10.9h-4.1s4.1,0,4.1,0v21.8h0ZM309.1,589.1h3s-3,0-3,0c0,0,0,0,0,0ZM381.8,687.3h10.9v-10.9h-10.9v10.9ZM403.6,698.2v10.9h10.9v-10.9h-10.9Z"></path></g>
+                            <g class="umap-region" data-bg="gdT.U_points_geom.png" data-tooltip="gdT.U" id="gdT.U"><path d="M360,392.7h10.9v10.9h-10.9v-10.9ZM381.8,305.5h-21.8v32.7h10.9v10.9h-10.9v21.8h10.9v-10.9h32.7v-54.5h-21.8ZM425.5,327.3v-21.8h-21.8v65.5h10.9v-21.8h21.8v-10.9h10.9v-10.9h-21.8ZM447.3,360v-10.9h-10.9v10.9h10.9ZM458.2,381.8h10.9v-10.9h-10.9v10.9ZM458.2,338.2v10.9h10.9v-10.9h-10.9Z"></path></g>
+                            <g class="umap-region" data-bg="gdT.T_points_geom.png" data-tooltip="gdT.T" id="gdT.T"><polygon points="392.7 261.8 381.8 261.8 370.9 261.8 370.9 272.7 360 272.7 349.1 272.7 349.1 283.6 360 283.6 360 294.5 360 305.5 370.9 305.5 381.8 305.5 381.8 294.5 392.7 294.5 392.7 283.6 392.7 272.7 403.6 272.7 403.6 261.8 392.7 261.8"></polygon></g>
+                            <g class="umap-region" data-bg="gdT.X_points_geom.png" data-tooltip="gdT.X" id="gdT.X"><rect x="305.5" y="414.5" width="10.9" height="10.9"></rect></g>
+                            <g class="umap-region" data-bg="gdT.K_points_geom.png" data-tooltip="gdT.K" id="gdT.K"><path d="M349.1,687.3h10.9v10.9h-10.9v10.9h-10.9v-10.9h-54.5v-10.9h6.1s-6.1,0-6.1,0h-10.9v-10.9h-10.9v-8.9h-.1v-23.9h-10.8v-21.8h3s-3,0-3,0h-10.9v-10.9h10.9v-21.8h21.8v32.7h-3.2s3.2,0,3.2,0v21.8h0v21.8h32.7v10.9h10.9v-10.9h21.8v21.8h-5.8s5.8,0,5.8,0h10.9ZM349.1,687.3h10.9v-10.9h-10.9v10.9ZM360,589.1v10.9h10.9v-10.9h-10.9Z"></path></g>
+                            <g class="umap-region" data-bg="gdT.H_points_geom.png" data-tooltip="gdT.H" id="gdT.H"><path d="M283.6,589.1h10.9v21.8h-21.8v-21.8h10.9ZM316.4,545.5v10.9h-10.9v10.9h21.8v-21.8h-10.9Z"></path></g>
+                            <g class="umap-region" data-bg="gdT.wM_points_geom.png" data-tooltip="gdT.wM" id="gdT.wM"><path d="M338.2,458.2h-54.5v10.9h2.4s-2.4,0-2.4,0v21.8h32.7v-10.9h32.7v-10.9h-1.9,0s1.9,0,1.9,0h10.9v-10.9h-21.8ZM286.6,469.1h.5s-.5,0-.5,0h0ZM360,349.1v10.9h-10.9v21.8h-10.9v-43.6h10.9v10.9h10.9Z"></path></g>
+                            <g class="umap-region" data-bg="gdT.P_points_geom.png" data-tooltip="gdT.P" id="gdT.P"><path d="M338.2,567.3h-10.9v-10.9h10.9v10.9ZM338.2,567.3v10.9h21.8v-10.9h-21.8ZM338.2,316.4v10.9h10.9v21.8h10.9v-32.7h-21.8ZM349.1,567.3h10.9v-10.9h-10.9v10.9ZM501.8,534.5h-10.9v10.9h10.9v-10.9ZM567.3,534.5h10.9v-10.9h-10.9v10.9ZM567.3,501.8v21.8h10.9v-10.9h10.9v-10.9h-21.8ZM665.5,600v10.9h-10.9v10.9h21.8v-10.9h10.9v-10.9h-21.8ZM752.7,600h10.9v-10.9h-10.9v10.9ZM752.7,589.1h10.9v-10.9h-10.9v10.9ZM785.5,589.1h10.9v-10.9h-10.9v-10.9h-10.9v10.9h-10.9v10.9h21.8ZM796.4,589.1h-10.9v10.9h21.8v-10.9h-10.9ZM545.7,529.1c.2,1.1,0,2.2-.2,3.2v13.2h-10.9v10.9h-10.9v-9s0,0,0,0v19.9h-14s0,0,0,0h3.1v10.9h-10.9v-5.5s0,0,0,0v16.5h-6.2s6.2,0,6.2,0v10.9h-10.9v10.9h-21.8v-21.8h4.9s0,0,0,0h-4.9v-3.3s0,0,0,0v3.3h-16.8s0,0,0,0h5.9v10.9h-10.9v-6.6h0v17.5h-21.8v-10.9h10.9v-10.9h5.3s-5.3,0-5.3,0v-21.8h10.9v14.6h0v-3.7h10.9v-10.9h10.9v5.5s0,0,0,0v-5.5h3.9s-3.9,0-3.9,0v-10.9h32.7v3.2s0,0,0,0v-14.1h0v-21.8h14.8s0,0,0,0h-3.9v-10.9h10.9v5.9h0v-5.9h21.8v10.9h-3.2,0s3.2,0,3.2,0v4.5c0,.3.2.7.2,1ZM520.2,523.6h-1s1,0,1,0c0,0,0,0,0,0Z"></path></g>
+                        </svg>
+                    </div>
+                </div>
+                
+            </div>
+
+                        <!-- Center Container: Mouse Organs and Table -->
+            <div class="w-full md:w-1/4 flex flex-col gap-2 min-h-0 h-full mb-2">
+                
+                <!-- Mouse Organs Panel (responsive height) -->
+                <div class="bg-white p-1 rounded-lg shadow-lg flex flex-col min-h-0" style="flex: 31;">
+                    <h2 class="text-xl font-bold mb-2 text-center">Mouse Organs</h2>
+                    <!-- Mouse organs container with legend on the right -->
+                    <div class="flex flex-row gap-2 flex-1 min-h-0">
+                        <div id="mouse-container" class="flex-1 flex justify-center items-start">
+                            <svg id="mouse-svg" viewBox="0 20 260 500" preserveAspectRatio="xMidYMid meet" style="height: 100%; max-height: 100%;">
+                                <g id="whole_mouse_background">
+                            <rect width="260" height="520" style="fill: #808080;"/>
+                            <path d="M196.8,136.4c5.5-5.4,11.2-9,16.8-7.5,7,1.9,8,11.5,5.3,16.3-3.4,6.2-8.6,2.1-12.2,6.5-5.4,6.7-13.2,19.8-15.5,28s.3,9.5-2.1,14.5-5.4,7.7-8.6,11c-7,7.3-4.8,15.9-2.5,25.7,2.5,10.2,5.6,20.4,7.5,30.7s5.6,24.7,1.1,31.3c-7.3,10.8,8.3,26.4,8.9,38.7,25.7,43.9-41,57-26.5,79.2,6.6,6.6,22.1,9.9,24.5,22.6.9,4.5-.2,17.1-7.1,12.1-.6-.4-4.9-12.6-6-14.5-4.7,3,2.5.3-1,7-5.6-1.7-4.5-2.6-6.1-8.4-1.8-3.1-8.5-5-8.9-9.6-3.9-.8-18-7.6-15.6-13,5-3.3,4.6-13-.4-17-19.6-3.5-6,44.3-10.1,60.5-3.4,12.1-9.7,23.8-20.7,30.4-23.5,14-53.3-.6-70.6-17.9-8.6-8.6-17.5-19.6-18.1-32.2-.4-10.3,3.6-20.2,3.4-30.4s-2.9-13.8-11.2-20.3c-5.5-4.3-7-13.6,1.7-12.7s14.6,8.7,17.2,14c6.4,13.2-1,29.2,1.7,43.1,3.2,16.7,12.8,30.3,28.3,37.6,58.8,27.3,53.5-32,43.8-70.8-2.8-9.4-17.6,5.6-11.4,11.3,10.8,9.8-7.5,14.3-14,18.5-.2,4.1-6.1,6.5-7.3,9.3,0,7.2-7.4,10.6-5.2.8-4.1,1.4-5.6,12.4-7.5,14.6-13,0-4.4-20.4,2-25.1,4.9-4.1,19-7.8,19.1-16,.2-7.9-20.5-21-25.6-27.6-14.2-16-9.1-43.8,1.4-59,3.5-11.7,4.3-26.9,2-40-3.5-25.8,25.2-56.6,2.1-76.8-11.5-10.1-13.7-27.9-18.2-41.4s-7.9-7.6-13.2-14c-4.5-5.6-5.4-11.6,1.2-16,4.2-2.8,11.4-3.3,15.1.6,3.7,3.9,1.4,5,2.6,7.1,1.6,3,4.3,5,5.9,8.2.6,1.3,1.1,2.7,1.9,4.1s1.8,1.9,2.6,3.1c2,2.8,2.6,6.8,4.8,9.8,1.9,2.6,4.2,6,7.2,7.7,1.8,1,2.6.8,4.4.2,3.2-1.1,2-1.8,1.8-4.6-.4-5.3,6.3-8.2,8.6-12.1s3.2-10.3,3.4-15.9c.4-10.7,4-47.3,17.7-66.5,13.8-19.2,27.6,1.1,31.2,16,3,12.7,10.6,24,13,36.8,1,5.3-.4,11.1-.5,16.5,0,3.1,0,6.3.4,9.3.5,3.1,2.5,5.7,2.6,8.9,0,3,0,6.1.2,9.1,0,1.9.2,3.8,1.5,5,5.3,4.9,11.6-9.6,14.3-12.4,4.3-4.7,11.5-16,19.3-23.8l-.4-.4h0v-.2h0Z" style="fill: #c4c4c4; stroke: #4a5568; stroke-miterlimit: 10; stroke-width: .2px;"/>
+                            <g>
+                                <path d="M133.4,77.4c7.4-1.3,13-9,12.1-16.4" style="fill: none; stroke: #231f20; stroke-miterlimit: 10; stroke-width: .5px;"/>
+                                <path d="M124.4,76.9c-7.2-2-13.8-6.3-18.7-12.2" style="fill: none; stroke: #231f20; stroke-miterlimit: 10; stroke-width: .5px;"/>
+                                <path d="M138.3,83.7c8,.4,18.4-2.5,26.1-4.8" style="fill: none; stroke: #231f20; stroke-miterlimit: 10; stroke-width: .5px;"/>
+                                <path d="M122.4,82.6c-9.6-3.5-19.2-7.1-28.8-10.7" style="fill: none; stroke: #231f20; stroke-miterlimit: 10; stroke-width: .5px;"/>
+                                <path d="M117.5,86.6c-11.4.5-22.8-.8-33.8-3.8" style="fill: none; stroke: #231f20; stroke-miterlimit: 10; stroke-width: .5px;"/>
+                                <path d="M136.4,80.5c8.2.7,18.7-6.3,24.8-6.5" style="fill: none; stroke: #231f20; stroke-miterlimit: 10; stroke-width: .5px;"/>
+                                <path d="M136.3,72.2c2.1-1.7,3-4.8,2.1-7.3" style="fill: none; stroke: #231f20; stroke-miterlimit: 10; stroke-width: .5px;"/>
+                                <path d="M122.7,72.8c-2.2-1.6-4.1-3.5-5.5-5.8" style="fill: none; stroke: #231f20; stroke-miterlimit: 10; stroke-width: .5px;"/>
+                            </g>
+                            <g>
+                                <path d="M106.5,121.3c-7.8,2.3-14.7,7-20.1,13-3.4,3.8-10.4,14.5-6.4,19.5s20.8-5.4,23.8-10.5" style="fill: #c4c4c4; stroke: #000; stroke-miterlimit: 10; stroke-width: .2px;"/>
+                                <path d="M148.5,119.4c9.8,2.6,22,10,25.1,20.3,5.2,17.3-16,10.7-21.8,1.6" style="fill: #c4c4c4; stroke: #000; stroke-miterlimit: 10; stroke-width: .2px;"/>
+                            </g>
+                            <ellipse cx="126.3" cy="64.4" rx="4.9" ry="3.3" style="fill: #4f4f4e;"/>
+                            <path d="M126.4,72.8c2,1.3,5.2,4.3,8.4,2.1-2.9-2.1-7.2-3.3-7.7-7.9-2.5,3-3.2,7.8-8.6,7.9,1.6,3.3,7,0,7.9-2.1" style="fill: #4f4f4e;"/>
+                        </g>
+                        <g id="mouse-organs">
+                           <path class="mouse-organ-region" id="EarSkin" data-tooltip="Ear Skin" d="M81.9,140.8c2.1-3.8,6.9-11,11.5-11.2,3.8-.2,3.1,10.4,3.1,13.2,0,3.1-.3,6.5-2.1,8.9-2.5,3.2-6.8,3.7-10.7,4-1.9.1-3.3-2-3.8-4-.8-3.7.2-7.6,2-10.8Z"/>
+                            <path class="mouse-organ-region" id="BackSkin" data-tooltip="Back Skin" d="M61.7,315.1c2.7-13.3,4.5-25.1-.4-34.9l5.9-4.5c6.8,13.6,3.6,29.7,1.2,41.4l-6.8-2Z"/>
+                            <path class="mouse-organ-region" id="Per_Cav" data-tooltip="Peritoneal Cavity" d="M165,308.7c-3.4,8.6-3.1,19.7,2.9,26.4,1.6,1.8,3.6,3.2,5.6,4.6,2.4,1.7,4.9,3.3,7.3,4.9,3.4,2.2,7.5-2.5,11.6-2.1.1-14.1-7.8-26.9-10.8-40.7-.5-2.1-.9-4.4-2.5-5.8-3.6-3.2-7.7,3.2-9.7,5.5-1.8,2-3.3,4.5-4.4,7.2h0Z"/>
+                            <path class="mouse-organ-region" id="CNS" data-tooltip="Central Nervous System" d="M109.1,105.3c.2-4.4,1.4-8.4,3.7-12.2,5.3-8.6,15.1-12.7,23.6-5.4,4,3.4,7.9,9.4,8.4,14.7.3,3.1-.4,6.3-1.3,9.2s-.8,2.7-1.8,3.6-2.3.5-2.6,2.6c-.4,3.6-2.9,4.6-5.3,6.9s-3.9,4.5-7.5,4c-3.3-.5-6.9-2.9-8.9-5.4-1.3-1.7-1.1-4.1-3.5-5.2-.5-.2-1.1-.4-1.6-.8-.4-.3-.5-.8-.7-1.3-1.2-3.7-2.6-6.8-2.6-10.8h.1Z"/>
+                            <path class="mouse-organ-region" id="Mam_Gl" data-tooltip="Mammary Gland" d="M97.5,193.5s.2,0,.2-.1c12.7-9.7-5.5-25.7-16.5-17.3-.5.4-1,.9-1.1,1.5-.2.8.2,1.5.6,2.2,2.2,4.4,1.9,9.5,2,14.2,0,2.3,12.3.7,14.8-.5h0ZM163.3,177.9c-6.2-.7-12.6-.3-13.1,5.7-.5,6.3,6.8,12.2,12,14.3,3.8,1.6,8.6,1.2,11.3-1.9,3.9-4.6.5-11.3-.4-16.4-2.3-.4-5.9-1.3-9.7-1.7h-.1Z"/>
+                            <path class="mouse-organ-region" id="Blood" data-tooltip="Blood" d="M112.4,175.7c0-.4-.2-.7-.3-1-.4-1.8-.6-4.1-.5-6.4,0-.7,0-1.4.2-2.1,0-.6,0-1.1.2-1.8,0-1.3.4-2.5,1.1-3.5,1-1.6,2.5-2.6,4-2.9l.9-.2-.5-3.4-.9.2h-.4,0c-2.2.3-4.3,1.6-5.8,3.6,0-9.4,1.1-18.7,3.7-27.6l.3-.9-3.4-1-.3.9c-.9,2.9-1.6,5.9-2.1,8.9-1.2-2.2-2.8-4.1-4.8-5.3l-.7-.4-1.9,3,.7.4c3.6,2.3,5.7,7.1,5.1,11.6v.9h.2c-.9,10.3-.2,20.6,2.1,30.6l.9-.2.2.9h.4c.4-.1.7-.2.8-.3h.3"/>
+                            <path class="mouse-organ-region" id="LN" data-tooltip="Lymph Node" d="M78.7,187.1c.8,2.5,1.2,5.4,1.4,7.4.7,6.4-3.1,3.9-7.7,2-4.8-2.4-8.4-10.3-2.5-13.9s4.8-1,6.6.6c1,.9,1.7,2.3,2.3,3.9h-.1Z"/>
+                            <path class="mouse-organ-region" id="Sal_Gl" data-tooltip="Salivary Gland" d="M117.7,132.1c2.7-3.7,7.9-4.1,10.9-.8-1.8,3.7-1.9,8.3-3.2,12.3-1.2,4.1-4.6,7.8-7.8,6.4-2.2-1.1-3.4-4.2-3.4-7.2s1.1-5.8,2-8.6M139.3,131c-2.7-3.7-7.9-4.1-10.9-.8,1.8,3.7,1.9,8.3,3.2,12.3,1.2,4.1,4.6,7.8,7.8,6.4,2.2-1.1,3.4-4.2,3.4-7.2s-1.1-5.8-2-8.6"/>
+                            <path class="mouse-organ-region" id="Sm_Int" data-tooltip="Small Intestine" d="M123.1,341.6c-.9,0-1.6-.3-2.1-1-1.1-1.4-3.3-1.1-6.7-.5-3.8.7-10.1,1.8-12-4.8-.2-.6,0-1.3.2-1.9,4.1-7.9,15.5-6.1,25.7-4.5,5.9.9,13.2,2,15.2.2.5-.5.8-1.2.8-2.3-4.8-3.6-17.5-1.7-27.9-.2-7.8,1.1-14.5,2.1-18.6,1.2-1-.2-1.7-.8-2.1-1.7-1.3-3.9-1-7.1.9-9.4,4.4-5.5,15.9-4.8,28-3.9,8,.5,18.9,1.3,21-1.4.5-.6.3-1.7,0-2.6-7.1-3-14.3-1.4-21.8.3-8.8,2-17.9,4-26.6-1.8-.3-.2-.6-.5-.8-.8-1.3-2-1.5-4.2-.5-6.2,2.2-4.2,10.6-7.1,24.8-8.4,1.5-.2,2.9.9,3.1,2.4s-1,2.8-2.5,3c-12.6,1.1-19.3,3.6-20.4,5.5,0,0-.2.2,0,.6,6.4,3.9,13.4,2.4,21.6.6,8.2-1.8,17.4-3.9,26.6.5.6.3,1.1.8,1.3,1.4,1.5,3.6,1.4,6.5-.3,8.7-3.8,5-14,4.3-25.8,3.6-9.2-.6-20.5-1.4-23.1,1.9-.6.7-.7,1.6-.4,2.9,3.5.2,9.3-.7,15-1.4,12.8-1.9,27.5-4,33.5,2.5.4.4.6.9.7,1.5.3,3.3-.5,5.9-2.5,7.7-4.1,3.6-11.8,2.5-20,1.1-7.5-1.2-16.1-2.6-19.1.8.5.5,1.6.5,5,0,3.7-.7,8.8-1.6,12.1,2.4,1,1.1.8,2.8-.4,3.7-.5.4-1.1.6-1.7.6h0l-.2-.2h0Z"/>
+                            <path class="mouse-organ-region" id="Colon" data-tooltip="Colon" d="M121.8,336.9c3.1,2.3,7.8,2.8,12.4,3.6h.7c5.6,1.1,12.1,2.5,16.8,7.1,3.1,3,4.9,7.6,4.8,11.8-.2,3.6-1.7,6.8-4.3,9-4.2,3.5-9.5,3.2-13.8,3-3.6-.2-6.1-.3-7.1.9-1.1,1.2-.9,4.1-.6,7.1.4,4.3.9,9.6-2.6,13.9-1,1.1-2.3,1.8-3.7,1.8s-2-.4-2.9-1.1c-2-1.6-2.4-4.6-.8-6.6,1.1-1.4.8-4.2.5-7.2-.4-4.5-1-10.1,3.2-14.5,2.2-2.3,5.1-3.4,8.2-3.8s2.5,0,3.6-.3,2.2-1.4,3.4-1.9c1.4-.5,3-1,4.1-2,5-5.3-7.7-7.4-10.3-7.8h-.7c-5.2-1-5.9.6-10.8-3.1"/>
+                            <path class="mouse-organ-region" id="Liver" data-tooltip="Liver" d="M136.6,249.3c-7,9.5-29.5,7.2-38.9,11.4-5,2.2-10.2,5.5-15.6,4.4,1-7.9,1.2-15.5,5.1-22.9,3.4-6.4,10.1-5.5,16.3-5.4,6.4.2,12.9,0,19.3.8,6.4.8,16,2.4,16,4.4,0,2.9-.8,5.3-2.1,7.2h0Z"/>
+                            <path class="mouse-organ-region" id="Kidney" data-tooltip="Kidney" d="M91.6,296.5c-4,2.9-10,.5-12.5-3.6s-2.4-9.5-1.5-14.2c1-4.9,4.1-9.8,8.6-12.1,2.3-1.2,6.3-1.7,8.7-.5,4.4,2.1,1.7,5.5,1.3,9.1-1,7.7,1.9,16.7-4.6,21.2h0v.2h0Z"/>
+                            <path class="mouse-organ-region" id="Lung" data-tooltip="Lung" d="M154.8,197c.6,2.2.9,4.6.8,7.2-.4,10.2.9,20.6,1.6,30.8-5.5-1.9-10.9-3.9-16.2-5.7-5-1.8-10.8-4.2-12.1-9.3-.3-.8-.3-1.6-.4-2.3-1.4-11.6,1.1-28.7,8.2-38.4.7-1,1.8-2,3-1.9,1.1,0,1.9,1.1,2.7,2,1.4,1.9,3,3.5,4.6,5.2,3.8,3.9,6.5,7.7,7.8,12.3ZM98.7,198.6c-.4,2.1-.6,4.5-.6,7.3,0,10.1-1.5,20.5-2.3,30.6,5.5-1.9,10.9-3.9,16.2-5.7,5-1.8,10.8-4.2,12.1-9.3.3-.8.3-1.6.4-2.3,1.4-11.6-1.1-28.7-8.2-38.4-.7-1-1.8-2-3-1.9-1.1,0-1.9,1.1-2.7,2-1.4,1.9-3,3.5-4.6,5.2-4.3,4.4-6.4,7.9-7.3,12.4Z"/>
+                            <path class="mouse-organ-region" id="Prostate" data-tooltip="Prostate" d="M191.3,356.1c-3.5-3.2-.4-3.4-4.8-4.4-.5-.8-.5-1.1-1.3-.2-.8-2.4-5-.2-6.8.5-.6,1.1.2,2.2-1.4,2.2.1-.4-.2-.8-.6-1.1-1.7-6.2-7.7-4.5-12.1-2.1-2.5,1.5-.9,3-3,3.7,0,1.8-1.7,2-.7,3,2,.9-.7.9-.1,2.5,1.6,1,4.5,2.3,6.3,1.1,5.3-4.2-1.4-4.4,1.2-4.8,2.1,0,2.8,1.5,4.6,1.2.2.2,0,4,1.6,4.1,2-1.1.7.4,2.3.2,1.6-.8,1-3.4,3.1-3.6.9,0,.8,1.5.8,1.8.5.3.9,1,1.2,1.5,2,.9,6.7,1.1,7.4-1.6,2.2.7,2-2.7,2.1-4.1h.2Z"/>
+                            <path class="mouse-organ-region" id="Uterus" data-tooltip="Uterus" d="M83.9,343c0,.2,1,1.4,1.1,1.5.7.3,1.7-.4,2.3.7s0,.9-.2,1.5c-.4,1.9,1.4,2.3,1.5,2.9s-1,1.4.3,3,1.2,1,1.3,1c0,.2-.7,2.1.5,3.1s1,.3,1.1.7-.3.9,0,1.6c.5,1.7,2.2,1.7,2.4,2s0,1.7.4,2.4,2.2,1,2.7,1.7c.6.9.8,0,.7,1s-.7,1.6-.6,2.4c.2,2.2,1.7,2.8,3.7,2.3,2-.4,1-1.2,1.1-1.4.8-2.4-1.1-1.4.3-4.1.7-1.2,2.8-.8,3.5-2.9s0-1.3.3-1.6,1.5-.2,2-1.3,0-1.5.2-2.2.7-.4.9-.6.7-.9.7-.9c.3-.8,0-1.8.2-2.4s1.1-.7,1.4-1.7-.3-1.8-.3-2.1,1.4-1.1,1.6-1.8c.4-1.3-.8-2.2.9-3,1.1-.6.7.1,1.6-1.1l.4-.2v-.7c-1.2.3-2.4-.4-2.4-1.7h-.7c-1,.5-.7,1.3-.8,2s-.6.3-.8.6-.3.8-.4.9c-.2.2-2.1.3-2.4.7-1.2,1.1-.2,2.9-.4,3.7s-1.1.3-1.5,1.5.4,1.6.3,1.8-2,.9-2,2.4.3,1,.2,1.2-.7.3-.9.5c-.7.7-1,2.6-1.2,2.8s-.8,0-1.3.4c-1,.7-1.2,2.4-1.4,2.5-1,.7-1-1.2-1.4-1.7s-1.6-.8-1.8-1.2c-.3-.5-.2-1.8-1-2.7s-1-.6-1.1-.7c0-.1.3-1.5-.3-2.5s-1.4-.9-1.5-1c0-.2.4-.8.4-1.4,0-1.5-1.4-1.8-1.5-2.3-.2-.7.6-1.7-.2-2.9s-1-1.1-1.1-1.1c-1.2-.2-1.8-.2-2.7-1.4s-.8-1.5-1.1-2.1c-.2-.1-.5,0-.6,0,0,1.7-1.2,2.1-2.7,2h.4,0Z"/>
+                            <path class="mouse-organ-region" id="Tumor" data-tooltip="Tumor" d="M166.9,484.2c3.5,1,7.3.8,10.9.6l.2-.2c-.8-.1-1.6-.3-2.4-.4-1.5-.2-3-.3-4.5-.8-2-.6-.6-1.3.1-2.2,3.6-4.3,2.1-10.8-3-13-1-.4-1.9-.6-2.9-.7-.3,0-.6.1-.8-.3-.2-.3-.1-.5-.1-.9-.3-2.7-1.8-5.1-4.3-6.2-4.9-2-9.6,1.1-10.2,6.2,0,.4.1.8-.5.8-6.8-2.2-12.9,5.4-9.1,11.6,1.1,1.9,2.3,2.4,4.1,3.4.7.4.7,1.3,0,1.6-1.7.9-4,1.1-5.7,1.9-.3.1-1.3.6-1.4.8-.4.5.5.3.7.3,1.8-.2,3.6-.7,5.4-1,1.1-.2,2.3-.2,3.4-.5.8-.2,1.6-.7,2.3-.3,0,0,.9.7.9.8.4.6-.5,1.2-.8,1.7-.6.8-1.1,2.1-1.7,2.7-.3.3-.9.7-1.2.9-.8.5-2,.8-2.7,1.2-.1,0-.3.2-.2.4.2.3,2.4-.3,2.8-.5,1.1-.4,2.4-1.1,3.3-1.8,1-.7,2.1-2,3-2.5.1,0,.4-.2.5-.2.2,0,1.1.2,1.4.3,0,0,0,.1.1.1h.8c.6.2,1,.8,1.4,1.3,1.6,1.5,3.9,1.8,5.9,2.4,1.4.4,2.7,1.1,4.1,1.5.2,0,.7.2.9.3,0,0,.3,0,.3-.1-.3-.6-4.4-2.5-5.3-3-.5-.3-1-.6-1.4-1-.4-.3-1.2-1.2-.5-1.5.2,0,1.4-.5,1.6-.5.8-.2,3.9.5,5,.7s2.3.4,3.4.6c.8,0,6.4.6,6.7.3.1-.1-.4-.2-.5-.3-1.6-.4-3.4-.6-5.1-1-1.5-.4-3.1-.9-4.5-1.5-.6-.2-1.7-.4-1.4-1.2.1-.2.9-1,1.2-.9h-.2Z"/>
+                            <path class="mouse-organ-region" id="Spleen" data-tooltip="Spleen" d="M136.4,268.4c-.2,4.8,5.6,7.8,10.2,7.1s8.5-4.1,12.3-6.7c3.7-2.6,7.8-4.7,10.9-7.8,3.2-3.2,5.5-7.8,4.4-12.2s-6.3-7.8-6.3-7.8c-8.7,11.2-18.1,22.1-31.7,27.4h.2Z"/>
+                            <path class="mouse-organ-region" id="Placenta" data-tooltip="Placenta" d="M224.9,476.6l-.3-2.3c0-.3-.1-.6-.2-.9l1-.4s0,0,0,.1c0,0,.2,0,.3-.1l.3,1.1c-.2,0-.3.2-.4.3l-.8,2.2ZM240.2,484.1l-.8-.8c-.5.5-1,1-1.5,1.4l.8.8c.4-.4.9-.8,1.3-1.3s.1-.1.2-.2ZM242.6,481.4l-.9-.7c-.4.5-.9,1.1-1.4,1.6l.8.8c.5-.5,1-1.1,1.4-1.6ZM236.8,485.7c-.2.2-.4.4-.6.5-.3.3-.6.5-1,.9l.8.8c.3-.3.6-.6.9-.8.2-.2.4-.4.7-.5l-.7-.9ZM232.6,491.5l-.8-.8c-.1.2-.3.3-.4.4-.4.4-.7.7-1.1,1l.7.8c.4-.3.7-.7,1.1-1s.3-.3.4-.5ZM233.8,490.2c.4-.4.8-.9,1.2-1.3l-.8-.8c-.4.4-.8.9-1.2,1.3l-.3.3.8.8.3-.3ZM244.7,478.6l-.9-.6c-.4.6-.8,1.1-1.2,1.7l.9.7c.4-.6.9-1.1,1.3-1.7ZM229.2,493c-.6.4-1.2.7-1.7.9l.4,1c.7-.3,1.3-.6,2-1.1l-.6-.9ZM246.6,475.6l-1-.5c-.3.6-.7,1.2-1.1,1.8l.9.6c.4-.6.8-1.2,1.1-1.8ZM226.2,494.2s0,0,0,0h0s0,0,0,0c-.5.2-1.1.2-1.8.2v1.1c.8,0,1.5,0,2.1-.2,0,0,0,0,0,0l-.2-1.1ZM248.2,472.3l-1.1-.4c-.2.6-.5,1.2-.8,1.9l1,.5c.4-.7.6-1.4.9-2ZM248.8,469.3c0-.2,0-.5,0-.7h-1.1c0,.3,0,.5,0,.7,0,.4,0,.9-.1,1.4l1.1.2c.1-.5.2-1.1.2-1.6ZM222.9,494.3c-.6-.1-1.3-.3-2-.5l-.3,1.1c.8.2,1.5.4,2.1.5l.2-1.1ZM247.8,465l-1,.5c.3.7.5,1.3.7,1.9l1.1-.3c-.2-.7-.4-1.4-.7-2.1ZM219.6,493.4c-.7-.2-1.4-.5-2-.7l-.4,1.1c.6.2,1.3.5,2,.7l.4-1.1ZM246,461.9l-.9.6c.4.7.8,1.3,1.1,1.8l1-.5c-.3-.6-.7-1.1-1.1-1.8ZM216.3,492.2c-.5-.2-.9-.3-1.2-.4-.3,0-.6-.2-.9-.3l-.3,1.1c.3,0,.6.2.9.3.3,0,.7.2,1.1.4l.4-1.1ZM227.5,478.4s0,0-.1,0c-.2,0-.4,0-.6-.2-.1,0-.3-.2-.4-.3l-.7.8c.2.2.4.3.6.4.5.3,1,.5,1.5.4.2,0,.4-.1.6-.3l-.7-.9ZM229.8,475.8l-1.1-.3c-.2.7-.4,1.3-.7,2l1,.4c.2-.7.5-1.3.7-2ZM245,460.5c-.5-.5-1-.9-1.7-1.2l-.5,1c.5.3,1,.6,1.4,1,0,0,0,0,.1.1l.8-.8c0,0-.1-.1-.2-.2ZM230.8,472.4l-1.1-.3c-.2.7-.3,1.4-.5,2l1.1.3c.2-.7.4-1.4.5-2.1ZM213,491.1c0,0-.1,0-.2-.1-.2-.1-.4-.3-.6-.5s-.4-.4-.5-.7l-.9.6c.2.3.4.6.7.8s.5.5.8.6c0,0,.2.1.2.1l.6-1ZM234.4,466.8l-.9.7c0,.1.3.4-.3,1.3l.9.7c.9-1.3.6-2.1.3-2.6ZM232.4,469.5c-.2,0-.3.1-.5.2-.5.2-1.1.5-1.5.9h0s.8.8.8.8h0c.3-.3.7-.5,1.2-.7.2,0,.3-.2.5-.2l-.5-1ZM225.2,475.2h-1.1c0,.7.1,1.5.5,2.3l1-.5c-.3-.6-.4-1.2-.4-1.8ZM241.9,458.7c-.3-.1-.7-.2-1-.2-.4,0-.8-.1-1.2-.2v1.1c.3,0,.7,0,1,.1.3,0,.6.1.9.2l.3-1.1ZM210.7,486.8h-1.1c0,.9.2,1.6.5,2.3l1-.4c-.2-.6-.4-1.2-.4-1.9ZM233,465.9c-.6-.2-1.3-.4-2.2-.5v1.1c.7,0,1.3.2,1.8.4l.4-1ZM238.2,458.2c-.7,0-1.4,0-2.2.1v1.1c.8,0,1.5-.1,2.2-.1v-1.1ZM224.3,471.3c-.4-.4-1-.8-1.5-1l-.4,1c.4.2.8.5,1.2.8s.2.2.3.3l.9-.7c-.1-.1-.2-.3-.4-.4ZM211,483.5l-1.1-.3c-.2.7-.3,1.5-.3,2.2h1.1c0-.6.1-1.3.3-1.9ZM229.4,465.3c-.7,0-1.4,0-1.8,0-.1,0-.2,0-.3,0v1.1c0,0,.2,0,.3,0,.5,0,1.1,0,1.8,0v-1.1ZM234.6,458.5c-.7.1-1.4.3-2.1.4l.3,1.1c.7-.2,1.3-.3,2-.4l-.2-1.1ZM212.2,480.4l-.9-.6c-.4.6-.7,1.3-1,2l1,.4c.2-.6.5-1.2.9-1.8ZM216.7,475.4c0-.1.1-.2.2-.4l-1-.5c0,.1-.1.2-.2.3-.2.3-.4.7-.8,1s-.1.1-.2.2l.8.8c0,0,.2-.2.2-.2.4-.4.7-.8,1-1.3ZM213.7,477c-.2.2-.4.3-.5.4-.4.3-.7.7-1.1,1.1l.9.7c.3-.4.6-.7,1-1,.1-.1.3-.2.5-.4l-.7-.9ZM221.2,469.8c-.9-.1-1.7,0-2.4.5l.6,1c.5-.3,1-.4,1.7-.3v-1.1ZM231.1,459.4c-.7.2-1.4.5-2,.8l.5,1c.6-.3,1.2-.5,1.9-.7l-.3-1.1ZM226.1,465s0,0-.1,0c0,0,0,0,0,0-.2-.2-.1-.7,0-1l-1-.5c-.4.9-.4,1.8.2,2.3s0,0,0,0c0,0,.2.2.3.2l.5-1ZM218.6,472.1l-.9-.7c-.4.6-.8,1.3-1.1,1.9l1,.5c.3-.6.6-1.2,1-1.7ZM227.8,460.8c-.7.4-1.3.9-1.8,1.3l.8.8c.4-.4,1-.8,1.6-1.2l-.6-1ZM216.4,481.8l-.8.8c.2.2.2.5,0,.6s-.1,0-.2.1l.3,1.1c.3,0,.5-.2.7-.4.6-.6.6-1.6,0-2.2ZM214.9,482.6h0c.1-.1.2-.1.4-.1l.2-1.1c-.5,0-1,0-1.3.4h0c-.4.4-.6,1.1-.3,1.7l1-.4c0-.2,0-.4,0-.5ZM210.3,462.1c0-.4.4-.7.6-1.1.2-.3.5-1,.9-.9s.9,1.2,1,1.6c-.4,0-.7.5-.6.9s.5.7.9.6c-.3.1-.7.2-1,.4,0,0,.9.6,1,.6-.1,0-.7.8-.9,1-.4.5-.5.9.2,1.3s.8,0,.9-.4c0-.9-1.1-.3-.4-1.1s1.4-1,.3-1.5c-.3-.1-.6-.3-.5-.6.1-.5,1.3-.2.8-1.1s-.4-.4-.7-.6c.2.1.2-.7.2-.7,0-.3-.4-.4,0-.6,2.1-1.6,4.8,3.2,5.9,4.4,1.3,1.3,2.8,2.7,4.2,3.8.1.1,6,4.9,6.2,5l.7-.9s.6-1.4.6-1.4c-2.1-1.4-9.9-7.7-11.6-9.4-1-1-2.4-1.6-2.9-2.9-.2-.4-.5-.3-.5-.8s.7-.8,1.1-.9c.6-.2,1.2,0,1.6.4s.4.4.7.3c0,0,.2-.2.3-.2.7-.2,1.1.7,1.9.4s.9-.5,1.2-.8c-.4.4-.9.3-1.3,0s-.6-.7-1.1-.7c-4.8-.8.1-1.7,2.4-1.8,3.5-.2,7-.4,10.4-1.2,1.8-.4,1.5-1.2,3.6-.5.4.1,0-2.8,0-3-.4-1.1-1.1-1.9-2-2.6-2.3-1.9-5.2-3.1-8-3.8-3.7-1-7.7-1.3-11.1-1.1-4.5.3-7,2.5-10.4,4.9-.9.6-2.5,2-3.2,2.9,0,.1,0,.2,0,.3-.1.2-.3.2-.4.3-.5.5-.7,1.2-1.1,1.6-1.1,1.2-1.5,2.8-2.1,4.2-.3.6-.7,1.2-.9,1.8,0,.3,0,.8-.1,1.1-.2,1.1-.4,2.1-.6,3.1,0,.4-.1,1.1-.1,1.4,0,1.1.8,2,.9,3s-.3,1.9,0,3c.5,2.4.7,4.3.6,6.9,0,1.1,0,2.2.5,3.1.7,1,1.9,1.3,3.1,1.2s2.2-.6,3.3-1.1c-.2.1,1.1-4.6,1.2-5,.7-1.6.3-2.5.6-4.3,0-.6.3-1,.6-1.5,0,0,0,0,0,0,.3-.3.6-.6.9-.9.1-.1.3-.3.4-.4.5-.6.3-.5.5-1,.4-1.2.8-2.3,1.2-3.4,0-.2.3-.3.3-.5.1-.3,0-.6,0-.9Z"/>
+                            <path class="mouse-organ-region" id="BM" data-tooltip="Bone Marrow" d="M179.5,172.6c-.4.8-.7,1.6-.9,2.5-1.1,4.2-.1,6,4.5,6s2.4-3.6,3.1-5.1c1.2-2.4,3.4-4.3,5.3-6.1,2.9-2.7,4-5.2,5.4-8.8s4-6.1,5.8-9.1c1.8-2.8,3.4-5.7,5-8.6,1.8-3.3-1.1-6.2-4.6-4.8-.9.3-1.6,1-2.2,1.6-2.4,2.4-4.4,5.3-5.6,8.5-2.5,6.4-6.2,12.3-10.8,17.4-1.8,2-3.8,4.1-5,6.6h0Z"/>
+                            <path class="mouse-organ-region" id="Thymus" data-tooltip="Thymus" d="M118,182.2c-.4-5.3-1.4-10.8-.3-15.9.8-3.5,4.1-6,3.5-9.8,2-2.1,6.2-.7,6.6,2.1,1.9,1.1,3.6-1.8,5.6-2.6,4.7-2,5.8,4.2,6.2,7,.8,5.5,1.9,12.8-.7,18-.9,1.8-2.7,3.3-4.7,3.2-2.7-.1-4.9-3-7.6-2.5-3.4.6-5.2,6.1-8.5,4.9,0-1.4,0-2.9-.2-4.3Z"/>
+                            <path class="mouse-organ-region" id="Pancreas" data-tooltip="Pancreas" d="M150.9,290c1.3,0,2.9.3,4-.4s2.1-1.3,2.5.3c1.2-.4,2.3-1,3.4-1.5.4-.2.8,0,1.1.4s.5.7.9.8c.7.2,1.3-.6,1.9-1.1.5-.4,1.2-.6,1.9-.6s1-.4,1.4-.7c.7-.7,1.4-1.3,2.2-2,1.3,0,2.5,1.7,3.8.2.3-.4.5-.9.8-1.3s.5-.5.8-.8c.4-.6,0-1.7.8-2.2.2-.1.4-.2.6-.3.5-.4,0-1.2,0-1.8.1-.7,1-.9,1.3-1.6s-.2-1.5-.3-2.2-.2-1.5-1.1-1.6-1.6-.2-2.2.3c-.3.2-.6.6-.9.7h-.7c-1.9-.2-3.9.5-5.3,1.8s-.3.3-.5.4c-.3.1-.6,0-.9,0-1-.2-2.2.1-2.9.9s-.6.7-1,.8h-.5c-2.4.1-4.7.8-6.8,1.9-.8-.2-1.7,0-2.3.7-.3-.5-.8-.8-1.2-1.2-.8.1-1.6.3-2.4.4-1.1.2-2.1,0-3.2,0s-2.4.6-3.7.5c-1.1,0-2.1-.6-3.1-.6s-1,0-1.5.2c-1,.3-2,.8-2.6,1.6-.4.6-.6,1.3-.9,2-.2.8-.5,1.6-.5,2.4,0,1.5.5,2.9,1.3,4.1,1.2-.8,2.8-.8,4.3-.6.9.1,1.8.3,2.7.3s1.7-.3,2.6-.3c2,0,4.1.2,6.1.2h0Z"/>
+                            <path class="mouse-organ-region" id="Syn" data-tooltip="Synovium" d="M163.9,404.2c-.7-1.7-1.7-2.8-4.9-3-2.9-.2-9.3,2.4-10.4,5.5s3.3,5.9,5.9,7.6c4,2.6,7.7,5.6,10.8,9.2,1,1.1,1.9,2.3,3.1,3.2,8,6,21.4-6.4,6.2-12.1-4.3-1.6-6.9-3.1-9.1-7s-1.1-2.4-1.5-3.4Z"/>
+                        </g>
+                        <!-- Organ Labels and Lines -->
+                        <g id="mouse-organ-lines"></g>
+                        <g id="mouse-organ-labels"></g>
+                        </svg>
+                    </div>
+                    <!-- Organ legend moved to the right side -->
+                    <div id="organ-legend" class="flex flex-col gap-1 justify-center px-2 py-1">
+                        <div class="flex items-center mb-1"><div class="w-4 h-4 rounded mr-1 border border-gray-400" style="background-color: #FFFFFF;"></div><span class="text-xs">Absent</span></div>
+                        <div class="flex items-center mb-1"><div class="w-4 h-4 rounded mr-1 border border-gray-400" style="background-color: #2166ac;"></div><span class="text-xs">Very Low</span></div>
+                        <div class="flex items-center mb-1"><div class="w-4 h-4 rounded mr-1 border border-gray-400" style="background-color: #abdda4;"></div><span class="text-xs">Low</span></div>
+                        <div class="flex items-center mb-1"><div class="w-4 h-4 rounded mr-1 border border-gray-400" style="background-color: #ffffbf;"></div><span class="text-xs">Moderate</span></div>
+                        <div class="flex items-center mb-1"><div class="w-4 h-4 rounded mr-1 border border-gray-400" style="background-color: #fdae61;"></div><span class="text-xs">High</span></div>
+                        <div class="flex items-center mb-1"><div class="w-4 h-4 rounded mr-1 border border-gray-400" style="background-color: #d53e4f;"></div><span class="text-xs">Very High</span></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Table Panel (reduced height) -->
+                <div id="table-panel" class="bg-white p-2 rounded-lg shadow-lg flex flex-col min-h-0" style="flex: 19;">
+                    <div class="flex items-center justify-between w-full mb-2 relative">
+                        <h2 class="text-lg font-bold text-center flex-1">Top10 Sample Names</h2>
+                        <a id="table-download-btn" href="#" download aria-label="Download Table" title="Download Table" class="ml-2 download-icon-btn hidden">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 4v12"/></svg>
+                        </a>
+                    </div>
+                    <div id="table-content" class="w-full flex-1 flex flex-col items-center justify-center overflow-y-auto">
+                        <span class="text-gray-400">empty</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Two Volcano Plot Panels -->
+            <div class="w-full md:w-1/3 flex flex-col gap-2 min-h-0 h-full mr-2 mb-2">
+                <div id="volcano-panel-1" class="bg-white p-2 rounded-lg shadow-lg flex-1 flex flex-col items-center min-h-[200px]">
+                  <div class="flex items-center justify-between w-full mb-2 relative">
+                    <h2 class="text-lg font-bold text-center flex-1">Differentially expressed genes (vs. All)</h2>
+                    <div class="flex items-center ml-2">
+                      <a id="volcano-download-btn-1" href="#" download aria-label="Download Volcano Plot (vs. All)" title="Download Volcano Plot (vs. All)" class="download-icon-btn hidden mr-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 4v12"/></svg>
+                      </a>
+                      <a id="fc-download-btn-1" href="#" download aria-label="Download Fold Change and P-values (vs. All)" title="Download Fold Change and P-values (vs. All)" class="download-icon-btn hidden">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                      </a>
+                    </div>
+                  </div>
+                  <div id="volcano-content-1" class="w-full flex-1 flex flex-col items-center justify-center">
+                    <span class="text-gray-400">empty</span>
+                  </div>
+                </div>
+                <div id="volcano-panel-2" class="bg-white p-2 rounded-lg shadow-lg flex-1 flex flex-col items-center min-h-[200px]">
+                  <div class="flex items-center justify-between w-full mb-2 relative">
+                    <h2 class="text-lg font-bold text-center flex-1">Differentially expressed genes (vs. AllResting/AllActivated)</h2>
+                    <div class="flex items-center ml-2">
+                      <a id="volcano-download-btn-2" href="#" download aria-label="Download Volcano Plot (vs. AllResting/AllActivated)" title="Download Volcano Plot (vs. AllResting/AllActivated)" class="download-icon-btn hidden mr-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 4v12"/></svg>
+                      </a>
+                      <a id="fc-download-btn-2" href="#" download aria-label="Download Fold Change and P-values (vs. AllResting/AllActivated)" title="Download Fold Change and P-values (vs. AllResting/AllActivated)" class="download-icon-btn hidden">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                      </a>
+                    </div>
+                  </div>
+                  <div id="volcano-content-2" class="w-full flex-1 flex flex-col items-center justify-center">
+                    <span class="text-gray-400">empty</span>
+                  </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tooltip = document.getElementById('tooltip');
+            const umapContainer = document.getElementById('umap-container-div');
+            const lockOverlay = document.getElementById('lock-overlay');
+
+            // Function to check window dimensions and show/hide lock overlay
+            function checkWindowDimensions() {
+                const windowWidth = window.innerWidth;
+                const windowHeight = window.innerHeight;
+                if (windowWidth < 1000 || windowHeight < 600) {
+                    lockOverlay.style.display = 'flex';
+                    document.body.classList.add('locked');
+                } else {
+                    lockOverlay.style.display = 'none';
+                    document.body.classList.remove('locked');
+                }
+            }
+
+            // Check on page load
+            checkWindowDimensions();
+
+            // Check on window resize
+            window.addEventListener('resize', checkWindowDimensions);
+            const umapRegions = document.querySelectorAll('#umap-svg .umap-region');
+            const organRegions = document.querySelectorAll('#mouse-svg .mouse-organ-region');
+            const organLabelsContainer = document.getElementById('mouse-organ-labels');
+            const organLinesContainer = document.getElementById('mouse-organ-lines');
+            const umapLegendContainer = document.getElementById('umap-legend');
+
+            const imageUrlBase = (window.location.href.replace(/[^/]+$/, '') || './') + 'images/';
+            const defaultUmapBg = imageUrlBase + 'gdTALL.png';
+
+            let organData = {};
+            let selectedClusterId = null; // Track selected cluster
+            let hoveredClusterId = null; // Track hovered cluster for volcano plot
+
+            const colorMap = {
+                absent: '#FFFFFF',
+                verylow: '#2166ac',
+                low: '#abdda4',
+                moderate: '#ffffbf',
+                high: '#fdae61',
+                veryhigh: '#d53e4f'
+            };
+            
+            const defaultLabelColor = '#FFFFFF';
+            const defaultLineColor = '#FFFFFF';
+                       
+            // Data for creating the UMAP legend
+            const umapLegendData = [
+                { id: 'gdT.B', color: '#0000ee', text: 'gdT.B' },
+                { id: 'gdT.A', color: '#ee7600', text: 'gdT.A' },
+                { id: 'gdT.V', color: '#bcee68', text: 'gdT.V' },
+                { id: 'gdT.Z', color: '#b23aee', text: 'gdT.Z' },
+                { id: 'gdT.R', color: '#00b2ee', text: 'gdT.R' },
+                { id: 'gdT.S', color: '#eea9b8', text: 'gdT.S' },
+                { id: 'gdT.C', color: '#76ee00', text: 'gdT.C' },
+                { id: 'gdT.F', color: '#EEAD0E', text: 'gdT.F' },
+                { id: 'gdT.G', color: '#8EE5EE', text: 'gdT.G' },
+                { id: 'gdT.Q', color: '#EE3B3B', text: 'gdT.Q' },
+                { id: 'gdT.E', color: '#B4EEB4', text: 'gdT.E' },
+                { id: 'gdT.J', color: '#EE3A8C', text: 'gdT.J' },
+                { id: 'gdT.D', color: '#00EEEE', text: 'gdT.D' },
+                { id: 'gdT.I', color: '#EEC591', text: 'gdT.I' },
+                { id: 'gdT.U', color: '#EE0000', text: 'gdT.U' },
+                { id: 'gdT.T', color: '#0000FF', text: 'gdT.T' },
+                { id: 'gdT.X', color: '#FF8C00', text: 'gdT.X' },
+                { id: 'gdT.K', color: '#556B2F', text: 'gdT.K' },
+                { id: 'gdT.H', color: '#9932CC', text: 'gdT.H' },
+                { id: 'gdT.wM', color: '#bebebe', text: 'gdT.wM' },
+                { id: 'gdT.P', color: '#000000', text: 'gdT.P' },
+            ];
+
+
+            const labelLayout = {
+                'CNS': { x: 90, y: 50, lx1: 100, ly1: 53, lx2: 125, ly2: 100 },
+                'EarSkin': { x: 15, y: 100, lx1: 55, ly1: 100, lx2: 85, ly2: 135 },
+                'Blood': { x: 15, y: 165, lx1: 42, ly1: 162, lx2: 105, ly2: 156 },
+                'LN': { x: 15, y: 215, lx1: 55, ly1: 205, lx2: 74, ly2: 198 },
+                'Lung': { x: 15, y: 235, lx1: 40, ly1: 232, lx2: 95, ly2: 225 },
+                'Liver': { x: 15, y: 255, lx1: 40, ly1: 252, lx2: 83, ly2: 252 },
+                'Kidney': { x: 15, y: 275, lx1: 50, ly1: 272, lx2: 79, ly2: 272 },
+                'BackSkin': { x: 15, y: 300, lx1: 65, ly1: 315, lx2: 65, ly2: 315 },
+                'Sm_Int': { x: 15, y: 325, lx1: 55, ly1: 325, lx2: 93, ly2: 325 },
+                'Uterus': { x: 15, y: 355, lx1: 47, ly1: 352, lx2: 90, ly2: 360 },
+                'Sal_Gl': { x: 180, y: 100, lx1: 178, ly1: 100, lx2: 142, ly2: 135 },
+                'Thymus': { x: 200, y: 195, lx1: 198, ly1: 192, lx2: 140, ly2: 162 },
+                'BM': { x: 190, y: 120, lx1: 205, ly1: 123, lx2: 205, ly2: 137 },
+                'Mam_Gl': { x: 180, y: 220, lx1: 183, ly1: 210, lx2: 172, ly2: 198 },
+                'Spleen': { x: 200, y: 255, lx1: 198, ly1: 252, lx2: 174, ly2: 255 },
+                'Pancreas': { x: 200, y: 285, lx1: 198, ly1: 282, lx2: 177, ly2: 282 },
+                'Per_Cav': { x: 200, y: 315, lx1: 198, ly1: 312, lx2: 186, ly2: 315 },
+                'Prostate': { x: 210, y: 360, lx1: 208, ly1: 357, lx2: 192, ly2: 357 },
+                'Colon': { x: 200, y: 395, lx1: 198, ly1: 392, lx2: 156, ly2: 367 },
+                'Syn': { x: 200, y: 425, lx1: 198, ly1: 422, lx2: 183, ly2: 422 },
+                'Tumor': { x: 155, y: 505, lx1: 135, ly1: 502, lx2: 145, ly2: 490, textAnchor: 'middle' },
+                'Placenta': { x: 220, y: 505, lx1: 195, ly1: 502, lx2: 210, ly2: 490, textAnchor: 'middle' }
+            };
+            
+            function createUmapLegend() {
+                umapLegendData.forEach(item => {
+                    const legendDiv = document.createElement('div');
+                    legendDiv.className = 'legend-item flex items-center p-1 rounded';
+                    legendDiv.dataset.clusterId = item.id;
+
+                    const colorBox = document.createElement('div');
+                    colorBox.className = 'w-4 h-4 mr-2 border border-gray-400';
+                    colorBox.style.backgroundColor = item.color;
+                    
+                    const text = document.createElement('span');
+                    text.className = 'text-sm';
+                    text.textContent = item.text;
+
+                    legendDiv.appendChild(colorBox);
+                    legendDiv.appendChild(text);
+                    umapLegendContainer.appendChild(legendDiv);
+                });
+            }
+
+            function createLabelsAndLines() {
+                Object.keys(labelLayout).forEach(organId => {
+                    const layout = labelLayout[organId];
+                    const organ = document.getElementById(organId);
+                    if (!organ) return;
+                    
+                    const organName = organ.getAttribute('data-tooltip');
+
+                    // Skip lines for Tumor and Placenta
+                    if (organId !== 'Tumor' && organId !== 'Placenta') {
+                        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                        line.setAttribute('id', `line-${organId}`);
+                        line.setAttribute('class', 'organ-line');
+                        line.setAttribute('x1', layout.lx1);
+                        line.setAttribute('y1', layout.ly1);
+                        line.setAttribute('x2', layout.lx2);
+                        line.setAttribute('y2', layout.ly2);
+                        organLinesContainer.appendChild(line);
+                    }
+
+                    const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    label.setAttribute('id', `label-${organId}`);
+                    label.setAttribute('class', 'organ-label');
+                    label.setAttribute('x', layout.x);
+                    label.setAttribute('y', layout.y);
+                    if (layout.textAnchor) {
+                        label.style.textAnchor = layout.textAnchor;
+                    }
+                    if (organId === 'Per_Cav') {
+                        // Wrap as two lines
+                        const tspan1 = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+                        tspan1.setAttribute('x', layout.x);
+                        tspan1.setAttribute('dy', '0');
+                        tspan1.textContent = 'Peritoneal';
+                        const tspan2 = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+                        tspan2.setAttribute('x', layout.x);
+                        tspan2.setAttribute('dy', '10');
+                        tspan2.textContent = 'Cavity';
+                        label.appendChild(tspan1);
+                        label.appendChild(tspan2);
+                    } else if (organId === 'Sm_Int') {
+                        // Wrap as two lines for Small Intestine
+                        const tspan1 = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+                        tspan1.setAttribute('x', layout.x);
+                        tspan1.setAttribute('dy', '0');
+                        tspan1.textContent = 'Small';
+                        const tspan2 = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+                        tspan2.setAttribute('x', layout.x);
+                        tspan2.setAttribute('dy', '10');
+                        tspan2.textContent = 'Intestine';
+                        label.appendChild(tspan1);
+                        label.appendChild(tspan2);
+                    } else {
+                        label.textContent = organName;
+                    }
+                    organLabelsContainer.appendChild(label);
+                });
+            }
+
+            function loadData() {
+                fetch('resources/organ_count_cluster.csv')
+                    .then(response => {
+                        if (!response.ok) throw new Error('Network response was not ok');
+                        return response.text();
+                    })
+                    .then(csvText => {
+                        // Parse CSV
+                        const lines = csvText.trim().split('\n');
+                        const headers = lines[0].split(',').map(h => h.trim().replace(/^\uFEFF/, ''));
+                        for (let i = 1; i < lines.length; i++) {
+                            const values = lines[i].split(',');
+                            const organId = values[0].trim();
+                            for (let j = 1; j < headers.length; j++) {
+                                const clusterId = headers[j].trim();
+                                const value = parseFloat(values[j]);
+                                if (!organData[clusterId]) {
+                                    organData[clusterId] = {};
+                                }
+                                organData[clusterId][organId] = value;
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Failed to load or parse organ data:', error);
+                        umapContainer.innerHTML = `<p class="text-red-500 text-center">Failed to load data. Please check the console.</p>`;
+                    });
+            }
+
+            function getColorForValue(value) {
+                if (value > 0.1) return colorMap.veryhigh;
+                if (value > 0.01) return colorMap.high;
+                if (value > 0.001) return colorMap.moderate;
+                if (value > 0.0001) return colorMap.low;
+                if (value > 0) return colorMap.verylow;
+                return colorMap.absent;
+            }
+            
+            function updateOrganColors(clusterId) {
+                //const csvClusterId = clusterIdMap[clusterId];
+                const csvClusterId = clusterId;
+                if (!csvClusterId) return;
+
+                const clusterInfo = organData[csvClusterId];
+                if (!clusterInfo) return;
+
+                organRegions.forEach(organ => {
+                    const organId = organ.id;
+                    const value = clusterInfo[organId] !== undefined ? clusterInfo[organId] : 0;
+                    const color = getColorForValue(value);
+                    
+                    organ.style.fill = color;
+
+                    const label = document.getElementById(`label-${organId}`);
+                    if (label) {
+                        if (value === 0) {
+                            label.style.fill = '#FFFFFF';
+                        } else {
+                            label.style.fill = color;
+                        }
+                    }
+                    
+                    const line = document.getElementById(`line-${organId}`);
+                    if (line) {
+                        if (value === 0) {
+                            line.style.stroke = '#FFFFFF';
+                        } else {
+                            line.style.stroke = color;
+                        }
+                    }
+                });
+            }
+
+            function resetOrganColors() {
+                organRegions.forEach(organ => {
+                    organ.style.fill = '#fff';
+                });
+                const organLabels = document.querySelectorAll('#mouse-svg .organ-label');
+                organLabels.forEach(label => {
+                    label.style.fill = '#fff';
+                });
+                const organLines = document.querySelectorAll('#mouse-svg .organ-line');
+                organLines.forEach(line => {
+                    line.style.stroke = '#fff';
+                });
+            }
+            
+            function showTooltip(event, text) {
+                tooltip.textContent = text;
+                tooltip.style.display = 'block';
+                moveTooltip(event);
+            }
+
+            function hideTooltip() {
+                tooltip.style.display = 'none';
+            }
+            
+            function moveTooltip(event) {
+                const offsetX = 16;
+                const offsetY = 0;
+                tooltip.style.left = `${event.pageX + offsetX}px`;
+                tooltip.style.top = `${event.pageY + offsetY}px`;
+            }
+            
+            function highlightLegend(clusterId, highlight) {
+                const legendItem = document.querySelector(`.legend-item[data-cluster-id='${clusterId}']`);
+                if (legendItem) {
+                    if (highlight) {
+                        legendItem.classList.add('legend-item-hover');
+                    } else {
+                        legendItem.classList.remove('legend-item-hover');
+                    }
+                }
+            }
+
+            function handleUmapEnter(e) {
+                const region = e.currentTarget;
+                const bg = region.getAttribute('data-bg') || region.dataset?.bg;
+                const tooltipText = region.getAttribute('data-tooltip') || region.dataset?.tooltip || region.id;
+                const clusterId = region.id;
+
+                if (bg) {
+                    umapContainer.style.backgroundImage = `url('${imageUrlBase}${bg}')`;
+                }
+                showTooltip(e, tooltipText);
+                // Don't update organ colors on hover - only when cluster is selected
+                // Highlight legend item
+                highlightLegend(clusterId, true);
+            }
+
+            function handleUmapLeave(e) {
+                // Only reset to default image if no cluster is selected
+                if (!selectedClusterId) {
+                    umapContainer.style.backgroundImage = `url('${defaultUmapBg}')`;
+                } else {
+                    // If a cluster is selected, maintain its image
+                    const selectedRegion = document.getElementById(selectedClusterId);
+                    if (selectedRegion) {
+                        const bg = selectedRegion.getAttribute('data-bg') || selectedRegion.dataset?.bg;
+                        if (bg) {
+                            umapContainer.style.backgroundImage = `url('${imageUrlBase}${bg}')`;
+                        }
+                    }
+                }
+                hideTooltip();
+                // Only reset organ colors if no cluster is selected
+                if (!selectedClusterId) {
+                    resetOrganColors();
+                } else {
+                    // If a cluster is selected, show its organ colors
+                    updateOrganColors(selectedClusterId);
+                }
+                // Remove highlight from all legend items
+                document.querySelectorAll('.legend-item.legend-item-hover').forEach(item => item.classList.remove('legend-item-hover'));
+            }
+
+            // --- Mouse Organ Event Listeners ---
+            organRegions.forEach(organ => {
+                organ.addEventListener('mouseenter', (e) => {
+                    const tooltipText = organ.getAttribute('data-tooltip');
+                    showTooltip(e, tooltipText);
+                });
+                organ.addEventListener('mouseleave', (e) => {
+                    hideTooltip();
+                });
+                organ.addEventListener('mousemove', moveTooltip);
+            });
+
+            // --- Event Listeners ---
+            umapRegions.forEach(region => {
+                region.addEventListener('mouseenter', (e) => {
+                    // Always highlight the hovered region
+                    region.classList.add('umap-region-hover');
+                    handleUmapEnter(e);
+                    hoveredClusterId = region.id;
+                    // Keep panels empty on hover (no dynamic updates)
+                    if (!selectedClusterId) {
+                        updateVolcanoPanel(1, null, false);
+                        updateVolcanoPanel(2, null, false);
+                        updateTablePanel(null, false);
+                    }
+                });
+                region.addEventListener('mouseleave', (e) => {
+                    region.classList.remove('umap-region-hover');
+                    handleUmapLeave(e);
+                    hoveredClusterId = null;
+                    // Don't restore outline to selected cluster - no black outline for selected clusters
+                });
+                region.addEventListener('mousemove', moveTooltip);
+                region.addEventListener('click', (e) => {
+                    selectLegend(region.id);
+                    // Don't call handleUmapEnter here since selectLegend now handles the image
+                    // Just show the tooltip
+                    const tooltipText = region.dataset.tooltip;
+                    showTooltip(e, tooltipText);
+                });
+            });
+
+            // Add legend event listeners after legend is created
+            function addLegendListeners() {
+                document.querySelectorAll('.legend-item').forEach(item => {
+                    const clusterId = item.dataset.clusterId;
+                    const region = document.getElementById(clusterId);
+                    if (region) {
+                        item.addEventListener('mouseenter', (e) => {
+                            // Always highlight the hovered region
+                            region.classList.add('umap-region-hover');
+                            handleUmapEnter({ currentTarget: region, pageX: e.pageX, pageY: e.pageY });
+                            hoveredClusterId = clusterId;
+                            // Keep panels empty on hover (no dynamic updates)
+                            if (!selectedClusterId) {
+                                updateVolcanoPanel(1, null, false);
+                                updateVolcanoPanel(2, null, false);
+                                updateTablePanel(null, false);
+                            }
+                        });
+                        item.addEventListener('mouseleave', (e) => {
+                            region.classList.remove('umap-region-hover');
+                            handleUmapLeave(e);
+                            hoveredClusterId = null;
+                            // Don't restore outline to selected cluster - no black outline for selected clusters
+                        });
+                        item.addEventListener('mousemove', (e) => {
+                            moveTooltip(e);
+                        });
+                        item.addEventListener('click', (e) => {
+                            selectLegend(clusterId);
+                            // Don't call handleUmapEnter here since selectLegend now handles the image
+                            // Just show the tooltip
+                            const tooltipText = region.dataset.tooltip;
+                            showTooltip(e, tooltipText);
+                        });
+                    }
+                });
+            }
+
+            // --- SELECT LEGEND FUNCTION ---
+            function selectLegend(clusterId) {
+                // Remove previous selection
+                document.querySelectorAll('.legend-item.legend-item-selected').forEach(item => item.classList.remove('legend-item-selected'));
+                document.querySelectorAll('.umap-region.umap-region-hover').forEach(item => item.classList.remove('umap-region-hover'));
+                //document.querySelectorAll('.umap-region.legend-selected').forEach(item => item.classList.remove('legend-selected'));
+                if (clusterId) {
+                    // Add selected style to legend
+                    const legendItem = document.querySelector(`.legend-item[data-cluster-id='${clusterId}']`);
+                    if (legendItem) legendItem.classList.add('legend-item-selected');
+                    // Don't add highlight to UMAP region when selected - no black outline
+                    // const region = document.getElementById(clusterId);
+                    // if (region) {
+                    //     region.classList.add('umap-region-hover');
+                    //     //region.classList.add('legend-selected');
+                    // }
+                    // Set the selected cluster's image
+                    const region = document.getElementById(clusterId);
+                    if (region) {
+                        const bg = region.getAttribute('data-bg') || region.dataset?.bg;
+                        if (bg) {
+                            umapContainer.style.backgroundImage = `url('${imageUrlBase}${bg}')`;
+                        }
+                    }
+                } else {
+                    // Reset to default image when no cluster is selected
+                    umapContainer.style.backgroundImage = `url('${defaultUmapBg}')`;
+                }
+                selectedClusterId = clusterId;
+                // Update organ colors immediately when cluster is selected
+                if (clusterId) {
+                    updateOrganColors(clusterId);
+                } else {
+                    resetOrganColors();
+                }
+                updateVolcanoPanel(1, clusterId, true); // Update volcano plot 1, true = show download
+                updateVolcanoPanel(2, clusterId, true); // Update volcano plot 2, true = show download
+                updateTablePanel(clusterId, true); // Update table panel, true = show download
+            }
+
+            // --- Volcano Plot Panel Update ---
+            function updateVolcanoPanel(panelNumber, clusterId, showDownload) {
+                const volcanoContent = document.getElementById(`volcano-content-${panelNumber}`);
+                const volcanoDownloadBtn = document.getElementById(`volcano-download-btn-${panelNumber}`);
+                const fcDownloadBtn = document.getElementById(`fc-download-btn-${panelNumber}`);
+                if (!volcanoContent) return;
+                if (!clusterId) {
+                    volcanoContent.innerHTML = `<span class="text-gray-400">No cluster selected (empty)</span>`;
+                    if (volcanoDownloadBtn) volcanoDownloadBtn.classList.add('hidden');
+                    if (fcDownloadBtn) fcDownloadBtn.classList.add('hidden');
+                    return;
+                }
+                // Show volcano plot for clusters with available plots (gdT.A, gdT.B, etc.)
+                if (clusterId.startsWith('gdT.')) {
+                    let imgPath, fcPath;
+                    if (panelNumber === 1) {
+                        imgPath = `resources/volcano_plots/${clusterId}_vs_All_volcano.png`;
+                        fcPath = `resources/volcano_plots/${clusterId}_vs_All_FC_list.csv`;
+                    } else {
+                        // For panel 2, only wM and P are available; others show Not Available
+                        if (!(clusterId === 'gdT.wM' || clusterId === 'gdT.P')) {
+                            volcanoContent.innerHTML = `<span class="text-gray-400">Not Available</span>`;
+                            if (volcanoDownloadBtn) volcanoDownloadBtn.classList.add('hidden');
+                            if (fcDownloadBtn) fcDownloadBtn.classList.add('hidden');
+                            return;
+                        }
+                        imgPath = `resources/volcano_plots/gdT.wM_vs_gdT.P_volcano.png`;
+                        fcPath = `resources/volcano_plots/gdT.wM_vs_gdT.P_FC_list.csv`;
+                    }
+                    volcanoContent.innerHTML = `<img id="volcano-img-${panelNumber}" src="${imgPath}" alt="Volcano plot ${panelNumber} for ${clusterId}" class="w-full h-full object-contain" style="display:block; max-width: 100%; max-height: 100%;">`;
+                    if (volcanoDownloadBtn && showDownload) {
+                        volcanoDownloadBtn.href = imgPath;
+                        volcanoDownloadBtn.download = imgPath.split('/').pop();
+                        volcanoDownloadBtn.classList.remove('hidden');
+                    }
+                    if (fcDownloadBtn && showDownload) {
+                        fcDownloadBtn.href = fcPath;
+                        fcDownloadBtn.download = fcPath.split('/').pop();
+                        fcDownloadBtn.classList.remove('hidden');
+                    }
+                } else {
+                    volcanoContent.innerHTML = `<span class="text-gray-400">No volcano plot available for this cluster.</span>`;
+                    if (volcanoDownloadBtn) volcanoDownloadBtn.classList.add('hidden');
+                    if (fcDownloadBtn) fcDownloadBtn.classList.add('hidden');
+                }
+            }
+
+            // --- Table Panel Update ---
+            function updateTablePanel(clusterId, showDownload) {
+                const tableContent = document.getElementById('table-content');
+                const tableDownloadBtn = document.getElementById('table-download-btn');
+                if (!tableContent) return;
+                if (!clusterId) {
+                    tableContent.innerHTML = '<span class="text-gray-400">No cluster selected (empty)</span>';
+                    if (tableDownloadBtn) tableDownloadBtn.classList.add('hidden');
+                    return;
+                }
+                // Only show for clusters with top10 names (gdT.A, gdT.B, etc.)
+                if (clusterId.startsWith('gdT.')) {
+                    const txtPath = `resources/top_names/${clusterId}_top10_names.txt`;
+                    fetch(txtPath)
+                        .then(response => {
+                            if (!response.ok) throw new Error('Not found');
+                            return response.text();
+                        })
+                        .then(text => {
+                            const lines = text.trim().split(/\r?\n/).filter(Boolean);
+                            let html = '<div class="w-full overflow-x-auto">';
+                            html += '<table class="w-full text-xs border-collapse">';
+                            html += '<thead>';
+                            html += '<tr class="bg-gray-100 border-b border-gray-300">';
+                            html += '<th class="px-2 py-1 text-left font-semibold">Organ</th>';
+                            html += '<th class="px-2 py-1 text-left font-semibold">Detailed Condition</th>';
+                            html += '<th class="px-2 py-1 text-left font-semibold">IGTHT</th>';
+                            html += '</tr>';
+                            html += '</thead>';
+                            html += '<tbody>';
+                            
+                            lines.forEach((line, index) => {
+                                const parts = line.split(' ');
+                                if (parts.length >= 3) {
+                                    // Extract the last part as IGTHT
+                                    const igtht = parts[parts.length - 1];
+                                    // Extract the second-to-last part as Detailed Condition
+                                    const detailedCondition = parts[parts.length - 2];
+                                    // Everything else is the Organ
+                                    const organ = parts.slice(0, -2).join(' ');
+                                    
+                                    const rowClass = index % 2 === 0 ? 'bg-white' : 'bg-gray-50';
+                                    html += `<tr class="${rowClass} hover:bg-blue-100 border-b border-gray-200">`;
+                                    html += `<td class="px-2 py-1">${organ}</td>`;
+                                    html += `<td class="px-2 py-1">${detailedCondition}</td>`;
+                                    html += `<td class="px-2 py-1">${igtht}</td>`;
+                                    html += '</tr>';
+                                }
+                            });
+                            
+                            html += '</tbody>';
+                            html += '</table>';
+                            html += '</div>';
+                            
+                            if (tableDownloadBtn) {
+                                tableDownloadBtn.href = txtPath;
+                                tableDownloadBtn.download = `${clusterId}_top10_names.txt`;
+                                tableDownloadBtn.classList.remove('hidden');
+                            }
+                            tableContent.innerHTML = html;
+                        })
+                        .catch(() => {
+                            tableContent.innerHTML = '<span class="text-gray-400">No table available for this cluster.</span>';
+                            if (tableDownloadBtn) tableDownloadBtn.classList.add('hidden');
+                        });
+                } else {
+                    tableContent.innerHTML = '<span class="text-gray-400">No table available for this cluster.</span>';
+                    if (tableDownloadBtn) tableDownloadBtn.classList.add('hidden');
+                }
+            }
+
+            // --- Initial Setup ---
+            createUmapLegend();
+            createLabelsAndLines();
+            loadData();
+            resetOrganColors();
+            umapContainer.style.backgroundImage = `url('${defaultUmapBg}')`;
+            addLegendListeners();
+            updateVolcanoPanel(1, null, false); // Ensure volcano panel 1 is empty on load
+            updateVolcanoPanel(2, null, false); // Ensure volcano panel 2 is empty on load
+            updateTablePanel(null, false); // Ensure table panel is empty on load
+
+            // --- Download button click handlers to prevent deselection ---
+            document.getElementById('volcano-download-btn-1').addEventListener('click', (e) => e.stopPropagation());
+            document.getElementById('volcano-download-btn-2').addEventListener('click', (e) => e.stopPropagation());
+            document.getElementById('fc-download-btn-1').addEventListener('click', (e) => e.stopPropagation());
+            document.getElementById('fc-download-btn-2').addEventListener('click', (e) => e.stopPropagation());
+            document.getElementById('table-download-btn').addEventListener('click', (e) => e.stopPropagation());
+
+            // --- Click on white area to deselect all clusters ---
+            umapContainer.addEventListener('click', (e) => {
+                // Check if the click was on the background (not on a cluster region)
+                const clickedElement = e.target;
+                if (clickedElement === umapContainer || clickedElement.id === 'umap-svg') {
+                    // Click was on the background area, deselect all clusters
+                    selectLegend(null);
+                }
+            });
+
+            // --- No automatic deselection - cluster stays selected until explicitly changed ---
+            // Removed the click outside logic to keep cluster selected
+        });
+    </script>
+</body>
+</html>

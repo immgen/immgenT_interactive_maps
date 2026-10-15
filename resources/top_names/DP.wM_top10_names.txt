@@ -1,0 +1,10 @@
+spleen baseline I60H1
+endocrine pancreas NOD I49H7
+axillary lymph node baseline I14H7
+spleen baseline I14H1
+inguinal lymph node B16_ACT I35H3
+mediastinal lymph node LCMVarm_D60 I40H10
+spleen NOD I49H2
+inguinal lymph node B16_ACTaPD1a41BB I35H5
+inguinal lymph node baseline I14H3
+pancreatic lymph node NOD I49H5

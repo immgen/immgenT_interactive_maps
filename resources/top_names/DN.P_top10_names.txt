@@ -1,0 +1,10 @@
+uterus CtrachomatisL2_primaryD5 I33H8
+uterus CtrachomatisD_primaryD5 I33H4
+lamina propria of mucosa of colon baseline I28H2
+uterus CtrachomatisD_primaryD15 I33H5
+lamina propria of mucosa of colon Tmuris I28H5
+epithelium of small intestine baseline I8H8
+colonic epithelium baseline I8H7
+lamina propria of mucosa of colon DSS I32H2
+lamina propria of small intestine baseline I9H10
+bone marrow baseline I7H3

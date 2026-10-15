@@ -1,0 +1,10 @@
+spleen baseline I1H4
+spleen baseline I1H3
+mammary gland 3dpp I1H1
+lamina propria of mucosa of colon SFB_mother_E18.5 I37H4
+ileum lamina propria SFB_mother_E18.5 I37H9
+lamina propria of mucosa of colon SFB_mother_30dpp I37H5
+epithelium of small intestine MNVCW3 I26H8
+lamina propria of mucosa of colon SFB_mother_E12.5 I37H6
+lamina propria of mucosa of colon SFB_mother_E6.5 I37H2
+ileum lamina propria SFB_mother_E6.5 I37H7

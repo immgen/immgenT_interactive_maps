@@ -1,0 +1,10 @@
+colonic epithelium baseline I8H7
+colonic epithelium baseline I20H3
+epithelium of small intestine baseline I20H5
+epithelium of small intestine baseline I20H4
+colonic epithelium baseline I30H9
+ileal epithelium CeDtg I31H2
+colonic epithelium baseline I30H8
+colonic epithelium baseline I21H3
+ileal epithelium Ddvillin_glia I31H9
+ileal epithelium CeDtg_glia I31H7

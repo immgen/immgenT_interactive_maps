@@ -1,0 +1,10 @@
+lung HDM_secondaryD3 I81H3
+lamina propria of mucosa of colon baseline I20H7
+lamina propria of mucosa of colon baseline I20H10
+lung HDM_secondaryD3 I81H2
+inguinal lymph node;axillary lymph node baseline I67H12
+lamina propria of mucosa of colon baseline I9H9
+lamina propria of mucosa of colon baseline I21H7
+skin of back baseline I5H9
+skin of body B16_ACT I35H2
+lamina propria of mucosa of colon baseline I67H7

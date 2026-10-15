@@ -1,0 +1,10 @@
+inguinal lymph node B16_ACT I35H3
+inguinal lymph node;axillary lymph node;brachial lymph node  VV_D80 I46H12
+inguinal lymph node;axillary lymph node;brachial lymph node  VV_D80 I46H4
+inguinal lymph node B16_ACTaPD1a41BB I35H5
+inguinal lymph node;axillary lymph node;brachial lymph node  VV_D80 I46H8
+spleen VV_D80 I46H14
+mediastinal lymph node HDM_secondaryD3 I81H6
+spleen baseline I85H22
+bone marrow baseline I11H3
+endocrine pancreas NOD I49H7

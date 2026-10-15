@@ -1,0 +1,10 @@
+epithelium of small intestine baseline I26H6
+epithelium of small intestine LCMVarm_D60 I40H7
+lamina propria of small intestine LCMVarm_D60 I40H8
+epithelium of small intestine MNVCR6 I26H9
+duodenal epithelium baseline I30H2
+lamina propria of small intestine LCMVarm_D30 I38H8
+epithelium of small intestine MNVCR6 I26H10
+epithelium of small intestine LCMVarm_D30 I38H7
+epithelium of small intestine MNVCR6_infant I80H7
+lamina propria of small intestine LCMVarm_D7 I36H8

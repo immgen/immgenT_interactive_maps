@@ -1,0 +1,10 @@
+spleen dirty_2m_LCMVarm_D7 I45H8
+spleen dirty_2m_LCMVarm_D7 I45H9
+spleen dirty_2m_LCMVarm_D7 I45H10
+lung LCMVarm_D7 I36H9
+spleen LCMVarm_D7 I36H2
+spleen LCMVcl13_D8 I48H4
+spleen LCMVcl13_D8 I48H2
+inguinal lymph node B16_ACTaPD1a41BB I35H5
+spleen Toxo_D23 I59H11
+epithelium of small intestine LCMVarm_D7 I36H7

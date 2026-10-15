@@ -1,0 +1,10 @@
+inguinal lymph node;axillary lymph node baseline I67H12
+spleen NP_OVA_D21 I70H2
+spleen NP_OVA_D21 I70H1
+spleen NP_OVA_D21 I70H4
+spleen NP_OVA_D7 I70H6
+spleen NP_OVA_D7 I70H10
+spleen NP_OVA_D21 I70H3
+spleen NP_OVA_D7 I70H8
+pancreas NOD_D14 I99H3
+spleen NP_OVA_D7 I70H7

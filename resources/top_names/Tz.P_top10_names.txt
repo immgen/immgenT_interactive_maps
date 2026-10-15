@@ -1,0 +1,10 @@
+liver baseline I88H9
+uterus baseline I33H2
+liver baseline I88H8
+blood baseline I7H1
+blood baseline I75H6
+kidney baseline I8H6
+liver KbDbKO I56H15
+liver KbDbKO I56H16
+liver MCMV I56H11
+blood baseline I75H10

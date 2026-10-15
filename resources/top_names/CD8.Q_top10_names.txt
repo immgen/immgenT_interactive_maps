@@ -1,0 +1,10 @@
+submandibular gland LCMVarm_D30 I38H4
+submandibular gland LCMVarm_D60 I40H4
+prostate gland LCMVarm_D60 I40H3
+lung flu I96H21
+prostate gland LCMVarm_D30 I38H3
+lamina propria of small intestine LCMVarm_D7 I36H8
+epithelium of small intestine LCMVarm_D7 I36H7
+lung flu I95H21
+lung LCMVarm_D7 I36H9
+skin of body B16_ACT I35H2

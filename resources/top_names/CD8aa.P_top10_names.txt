@@ -1,0 +1,10 @@
+epithelium of small intestine baseline I20H5
+epithelium of small intestine MNVCR6_infant I80H7
+uterus CtrachomatisL2_primaryD5 I33H8
+colonic epithelium baseline I20H3
+epithelium of small intestine baseline I20H4
+lamina propria of mucosa of colon DSS I32H2
+epithelium of small intestine LCMVarm_D7 I36H7
+colonic epithelium baseline I21H3
+lamina propria of mucosa of colon baseline I20H10
+lamina propria of small intestine LCMVarm_D7 I36H8

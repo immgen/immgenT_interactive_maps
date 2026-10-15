@@ -1,0 +1,10 @@
+liver baseline I8H5
+spleen KbDbQa1KO I22H5
+bone marrow baseline I7H3
+liver baseline I100H13
+spleen MHCIIKO I92H1
+inguinal lymph node;axillary lymph node;mesenteric lymph node  baseline I88H5
+kidney baseline I8H6
+liver baseline I101H13
+kidney baseline I101H24
+skin of external ear baseline I8H3

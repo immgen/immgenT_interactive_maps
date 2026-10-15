@@ -1,0 +1,10 @@
+skin of body B16_ACT I35H2
+lamina propria of mucosa of colon baseline I20H7
+lamina propria of mucosa of colon baseline I20H10
+bone marrow LCMVarm_D7 I36H5
+bone marrow baseline I11H3
+lamina propria of mucosa of colon baseline I21H10
+lamina propria of mucosa of colon baseline I21H7
+bone marrow LCMVarm_D60 I40H5
+bone marrow LCMVarm_D30 I38H5
+lamina propria of mucosa of colon baseline I28H2

@@ -1,0 +1,10 @@
+pancreas D14 I99H11
+mesenteric lymph node LCMVarm_D30 I38H6
+inguinal lymph node B16_ACT I35H3
+mediastinal lymph node LCMVarm_D30 I38H10
+spleen baseline I85H22
+pancreas NOD_D14 I99H3
+pancreas D17 I99H5
+mediastinal lymph node HDM_primaryD5 I81H17
+mesenteric lymph node baseline I19H6
+spleen baseline I19H1

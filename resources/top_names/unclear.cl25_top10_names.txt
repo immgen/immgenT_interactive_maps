@@ -1,0 +1,10 @@
+spleen baseline I1H3
+lung baseline I23H2
+spleen baseline I1H4
+spleen baseline I70H0
+lung baseline I23H3
+thymus baseline I18H4
+lung Afumigatus I23H6
+lung HDM I23H5
+thymus baseline I17H4
+lung Afumigatus I23H7

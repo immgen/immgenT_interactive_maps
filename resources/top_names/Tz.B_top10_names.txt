@@ -1,0 +1,10 @@
+skin of body B16_ACT I35H2
+mammary gland 3dpp I1H1
+spleen MHCIIKO I103H14
+lung baseline I88H11
+spleen MHCIIKO I102H14
+spleen MHCIIKO I103H15
+liver baseline I88H8
+liver baseline I88H9
+spleen baseline I88H3
+spleen MHCIIKO I92H1

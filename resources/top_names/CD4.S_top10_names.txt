@@ -1,0 +1,10 @@
+spleen Toxo_D23 I59H10
+lung MTB_6w I66H2
+brain Toxo_D23 I59H6
+spleen LCMVcl13_D27 I48H5
+uterus CtrachomatisD_secondaryD3 I77H15
+decidua SFB_mother_E12.5 I39H3
+lamina propria of mucosa of colon Crodentium I28H4
+spleen Toxo_D23 I59H8
+decidua SFB_mother_E18.5 I39H4
+lung MTB_49w I47H3

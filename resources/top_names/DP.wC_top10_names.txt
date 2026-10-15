@@ -1,0 +1,10 @@
+spleen baseline I14H1
+spleen baseline I13H1
+mesenteric lymph node baseline I13H6
+axillary lymph node baseline I14H7
+axillary lymph node baseline I13H7
+axillary lymph node baseline I14H8
+inguinal lymph node baseline I14H3
+inguinal lymph node baseline I14H4
+axillary lymph node baseline I13H8
+inguinal lymph node baseline I13H3

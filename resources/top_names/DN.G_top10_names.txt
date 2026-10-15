@@ -1,0 +1,10 @@
+spleen MHCIIKO I103H15
+lamina propria of mucosa of colon baseline I9H9
+pancreas D17 I99H5
+lamina propria of mucosa of colon SFB_mother_E12.5 I37H6
+pancreas NOD_D14 I99H3
+bone marrow baseline I101H14
+spleen baseline I85H22
+spleen KbDbKO I56H3
+colonic epithelium baseline I8H7
+spleen baseline I88H3

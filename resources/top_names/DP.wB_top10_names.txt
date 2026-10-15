@@ -1,0 +1,10 @@
+skin of body B16_ACT I35H2
+inguinal lymph node B16_ACTaPD1a41BB I35H5
+submandibular gland PD1KO I16H7
+inguinal lymph node B16_ACT I35H3
+mammary gland 3dpp I1H1
+lung LCMVarm_D7 I36H9
+spleen LCMVarm_D7 I36H2
+ileum lamina propria SFB_mother_E18.5 I37H9
+spleen LCMVcl13_D60 I48H10
+ileum lamina propria SFB_mother_E12.5 I37H8

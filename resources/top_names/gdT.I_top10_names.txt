@@ -1,0 +1,10 @@
+epithelium of small intestine baseline I20H4
+epithelium of small intestine baseline I20H5
+epithelium of small intestine baseline I26H6
+epithelium of small intestine baseline I8H8
+epithelium of small intestine baseline I21H5
+ileal epithelium baseline I30H7
+epithelium of small intestine baseline I21H4
+epithelium of small intestine MNVCR6 I26H10
+epithelium of small intestine LCMVarm_D30 I38H7
+ileal epithelium Ddvillin_glia I31H9

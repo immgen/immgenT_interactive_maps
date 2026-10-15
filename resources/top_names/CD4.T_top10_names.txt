@@ -1,0 +1,10 @@
+lamina propria of mucosa of colon Foxp3mutant_D28 I74H13
+lamina propria of mucosa of colon Foxp3mutant_D19 I24H7
+lung Foxp3mutant_D28 I74H15
+lamina propria of mucosa of colon Tmuris I78H9
+lung HDM_secondaryD3 I81H3
+lung Foxp3mutant_D19 I24H8
+lamina propria of mucosa of colon Tmuris I28H5
+lung HDM_secondaryD3 I81H8
+lung D28 I74H18
+lamina propria of mucosa of colon D28 I74H17

@@ -1,0 +1,10 @@
+spleen NP_OVA_D21 I70H2
+spleen NP_OVA_D21 I70H1
+spleen NP_OVA_D21 I70H4
+spleen NP_OVA_D7 I70H8
+spleen NP_OVA_D7 I70H6
+spleen NP_OVA_D21 I70H3
+spleen LCMVcl13_D60 I48H9
+spleen NP_OVA_D7 I70H10
+spleen NP_OVA_D21 I70H5
+spleen NP_OVA_D7 I70H9

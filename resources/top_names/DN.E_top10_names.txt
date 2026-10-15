@@ -1,0 +1,10 @@
+skin of body B16_ACT I35H2
+lamina propria of mucosa of colon baseline I9H9
+lamina propria of mucosa of colon baseline I101H16
+lamina propria of mucosa of colon baseline I100H16
+lamina propria of mucosa of colon baseline I20H7
+skin of back baseline I5H10
+skin of back baseline I5H9
+skin of back baseline I5H8
+lamina propria of mucosa of colon SFB_mother_E6.5 I37H2
+lamina propria of mucosa of colon DSS I32H1

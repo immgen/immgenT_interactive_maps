@@ -1,0 +1,10 @@
+colonic epithelium baseline I8H7
+epithelium of small intestine baseline I8H8
+epithelium of small intestine LCMVarm_D7 I36H7
+spleen KbDbQa1KO I22H4
+colonic epithelium Tmuris I78H2
+lamina propria of small intestine LCMVarm_D7 I36H8
+colonic epithelium Tmuris I78H3
+spleen KbDbQa1KO I22H5
+spleen KbDbKO I22H2
+lamina propria of small intestine baseline I100H15

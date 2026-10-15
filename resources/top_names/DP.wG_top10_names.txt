@@ -1,0 +1,10 @@
+spleen baseline I60H1
+cervical lymph node baseline I6H7
+cervical lymph node baseline I6H8
+blood baseline I2H2
+spleen baseline I2H3
+bone marrow baseline I2H5
+axillary lymph node baseline I6H4
+blood baseline I2H1
+bone marrow baseline I2H6
+lamina propria of mucosa of colon Foxp3mutant_D28 I74H14

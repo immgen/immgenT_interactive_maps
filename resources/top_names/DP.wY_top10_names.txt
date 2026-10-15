@@ -1,0 +1,10 @@
+mammary gland 3dpp I1H1
+epithelium of small intestine baseline I26H6
+epithelium of small intestine LCMVarm_D60 I40H7
+lamina propria of small intestine LCMVarm_D60 I40H8
+epithelium of small intestine baseline I20H5
+ileum lamina propria SFB_mother_E6.5 I37H7
+epithelium of small intestine LCMVarm_D7 I36H7
+ileum lamina propria SFB_mother_E18.5 I37H9
+epithelium of small intestine MNVCR6 I26H9
+lamina propria of mucosa of colon SFB_mother_E6.5 I37H2

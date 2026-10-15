@@ -1,0 +1,10 @@
+spleen MCMV I22H6
+spleen baseline I14H1
+mesenteric lymph node  baseline I100H5
+inguinal lymph node baseline I100H3
+mesenteric lymph node  baseline I101H5
+inguinal lymph node baseline I101H3
+axillary lymph node baseline I14H8
+inguinal lymph node B16_ACTaPD1a41BB I35H5
+inguinal lymph node baseline I14H3
+mesenteric lymph node baseline I14H6

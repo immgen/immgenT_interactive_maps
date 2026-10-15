@@ -1,0 +1,10 @@
+skin of body B16_ACT I35H2
+pancreas PDAC_aPD1aCTLA4 I65H5
+pancreas PDAC_aPD1aCTLA4 I65H4
+skin of body B16_ACTaPD1a41BB I35H4
+pancreas PDAC I65H3
+lung KP I96H17
+pancreas PDAC I64H3
+lung KP I95H17
+submandibular gland PD1KO I16H7
+pancreas PDAC I64H2

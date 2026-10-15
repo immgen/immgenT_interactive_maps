@@ -1,0 +1,10 @@
+endocrine pancreas NOD I49H7
+inguinal lymph node B16_ACTaPD1a41BB I35H5
+axillary lymph node baseline I7H4
+pancreas D17 I99H5
+inguinal lymph node baseline I7H6
+mediastinal lymph node HDM_secondaryD30 I52H12
+spleen baseline I85H22
+spleen Toxo_D9 I59H3
+inguinal lymph node baseline I13H3
+pancreatic lymph node NOD I49H5

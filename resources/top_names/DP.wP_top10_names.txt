@@ -1,0 +1,10 @@
+inguinal lymph node B16_ACTaPD1a41BB I35H5
+spleen baseline I60H1
+skin of body B16_ACT I35H2
+inguinal lymph node B16_ACT I35H3
+lamina propria of mucosa of colon Crodentium I28H4
+lamina propria of mucosa of colon Crodentium I28H3
+lung LCMVarm_D7 I36H9
+lamina propria of mucosa of colon baseline I28H2
+cervical lymph node baseline I6H8
+spleen Foxp3mutant_D19 I24H5

@@ -1,0 +1,10 @@
+inguinal lymph node B16_ACT I35H3
+endocrine pancreas NOD I49H7
+spleen baseline I11H2
+mediastinal lymph node LCMVarm_D60 I40H10
+mammary gland 3dpp I1H2
+mesenteric lymph node LCMVarm_D30 I38H6
+spleen baseline I19H1
+spleen baseline I19H9
+mediastinal lymph node LCMVarm_D30 I38H10
+mammary gland 3dpp I1H1
