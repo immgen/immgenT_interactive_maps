@@ -190,10 +190,16 @@
             padding: 8px 12px;
             border-radius: 6px;
             font-size: 14px;
-            white-space: nowrap;
+            white-space: pre-line;
+            max-width: 420px;
             pointer-events: none;
             display: none;
             z-index: 9999;
+        }
+
+        .tooltip .tip-label {
+            font-weight: 700;
+            color: #7dd3fc;
         }
 
         .legend-item.legend-item-hover {
@@ -822,8 +828,34 @@
                 });
             }
             
+            const clusterInfo = {
+                'Treg.A':  { state: 'rTreg',   previous: 'rTreg' },
+                'Treg.B':  { state: 'a/eTreg', previous: 'Tfr' },
+                'Treg.C':  { state: 'a/eTreg', previous: 'early TCR activated' },
+                'Treg.D':  { state: 'a/eTreg', previous: 'most ST2+ Tregs, most CCR8+ Tregs' },
+                'Treg.E':  { state: 'a/eTreg', previous: 'RORg Tregs' },
+                'Treg.F':  { state: 'a/eTreg', previous: 'CD49B+ Tregs' },
+                'Treg.wM': { previous: 'miniverse' },
+                'Treg.P':  { previous: 'proliferating' },
+            };
+
+            function escapeHtml(value) {
+                return String(value).replace(/[&<>"']/g, ch => ({
+                    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+                }[ch]));
+            }
+
+            function formatTooltipHtml(text) {
+                const info = clusterInfo[text];
+                if (!info) return escapeHtml(text);
+                const lines = [`<span class="tip-label tip-cluster">immgenT clusters:</span> ${escapeHtml(text)}`];
+                if (info.state) lines.push(`<span class="tip-label tip-state">Rest/Act:</span> ${escapeHtml(info.state)}`);
+                if (info.previous) lines.push(`<span class="tip-label tip-prev">Previous subset names:</span> ${escapeHtml(info.previous)}`);
+                return lines.join('<br>');
+            }
+
             function showTooltip(event, text) {
-                tooltip.textContent = text;
+                tooltip.innerHTML = formatTooltipHtml(text);
                 tooltip.style.display = 'block';
                 moveTooltip(event);
             }

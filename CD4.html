@@ -190,10 +190,16 @@
             padding: 8px 12px;
             border-radius: 6px;
             font-size: 14px;
-            white-space: nowrap;
+            white-space: pre-line;
+            max-width: 420px;
             pointer-events: none;
             display: none;
             z-index: 9999;
+        }
+
+        .tooltip .tip-label {
+            font-weight: 700;
+            color: #7dd3fc;
         }
 
         .legend-item.legend-item-hover {
@@ -846,8 +852,46 @@
                 });
             }
             
+            const clusterInfo = {
+                'CD4.A':  { state: 'rest/nve',  previous: 'resting, naive' },
+                'CD4.B':  { state: 'rest/nve',  previous: 'resting, naive' },
+                'CD4.C':  { state: 'rest/nve',  previous: 'resting, naive' },
+                'CD4.D':  { state: 'rest/nve',  previous: 'resting, naive, with IFN signature' },
+                'CD4.E':  { state: 'rest/nve',  previous: 'resting, naive, with TCR response signature' },
+                'CD4.F':  { state: 'rest/nve',  previous: 'resting, naive' },
+                'CD4.G':  { state: 'act/exper', previous: 'Tfh-like, Tfh-1, Tfh-2, Tfh-17/3, M-Tfh, Tph, Tcm (including Tcm-1, Tcm-2, Tcm-17/3), nTfh, Th0, uncommitted, some anergic/exhausted/dysfunctional' },
+                'CD4.H':  { state: 'act/exper', previous: 'GC-Tfh, some anergic/exhausted/dysfunctional' },
+                'CD4.I':  { state: 'act/exper', previous: 'anergic/dysfunctional/exhausted' },
+                'CD4.Q':  { state: 'act/exper', previous: 'polyfunctional, uncommitted, some Th1, Th2, some Th17 including pathogenic Th17, Trm (including Trm-1, Trm-2, Trm-3/17)' },
+                'CD4.R':  { state: 'act/exper', previous: 'Th1, CX3CR1- CXCR3+' },
+                'CD4.S':  { state: 'act/exper', previous: 'Th1, CX3CR1+ CXCR3- cytotoxic CD4' },
+                'CD4.T':  { state: 'act/exper', previous: 'Th2' },
+                'CD4.U':  { state: 'act/exper', previous: 'Th2' },
+                'CD4.X':  { state: 'act/exper', previous: 'Th17, Th22' },
+                'CD4.Y':  { state: 'act/exper', previous: 'Th17, Th22' },
+                'CD4.P':  { previous: 'proliferating' },
+                'CD4.wZ': { state: 'act/exper', previous: 'CD4+ CD8aa+ IEL' },
+                'CD4.wM': { previous: 'miniverse' },
+                'CD4.wN': { previous: 'Provisional, suspect distribution' },
+            };
+
+            function escapeHtml(value) {
+                return String(value).replace(/[&<>"']/g, ch => ({
+                    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+                }[ch]));
+            }
+
+            function formatTooltipHtml(text) {
+                const info = clusterInfo[text];
+                if (!info) return escapeHtml(text);
+                const lines = [`<span class="tip-label tip-cluster">immgenT clusters:</span> ${escapeHtml(text)}`];
+                if (info.state) lines.push(`<span class="tip-label tip-state">Rest/Act:</span> ${escapeHtml(info.state)}`);
+                if (info.previous) lines.push(`<span class="tip-label tip-prev">Previous subset names:</span> ${escapeHtml(info.previous)}`);
+                return lines.join('<br>');
+            }
+
             function showTooltip(event, text) {
-                tooltip.textContent = text;
+                tooltip.innerHTML = formatTooltipHtml(text);
                 tooltip.style.display = 'block';
                 moveTooltip(event);
             }

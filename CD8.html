@@ -190,10 +190,16 @@
             padding: 8px 12px;
             border-radius: 6px;
             font-size: 14px;
-            white-space: nowrap;
+            white-space: pre-line;
+            max-width: 420px;
             pointer-events: none;
             display: none;
             z-index: 9999;
+        }
+
+        .tooltip .tip-label {
+            font-weight: 700;
+            color: #7dd3fc;
         }
 
         .legend-item.legend-item-hover {
@@ -848,8 +854,47 @@
                 });
             }
             
+            const clusterInfo = {
+                'CD8.A':  { state: 'rest/nve',   previous: 'naive' },
+                'CD8.B':  { state: 'rest/nve',   previous: 'naive' },
+                'CD8.C':  { state: 'rest/exper', previous: 'Tpex (Ly108+, CD39-, TIM3-)' },
+                'CD8.D':  { state: 'rest/nve',   previous: 'CD62L+ CD44low' },
+                'CD8.E':  { state: 'rest/exper', previous: 'Tcm, Tcm-like, virtual memory, memory-phenotype' },
+                'CD8.F':  { state: 'rest/exper', previous: 'Similar to CD8.E with interferon-stimulated features' },
+                'CD8.G':  { state: 'act/exper',  previous: 'MPEC, Tem' },
+                'CD8.H':  { state: 'act/exper',  previous: 'LLEC, t-Tem, KLR-exhausted, KLRG1+' },
+                'CD8.I':  { state: 'act/exper',  previous: 'SLEC (KLRG1+), TE' },
+                'CD8.J':  { state: 'act/exper',  previous: 'Effector (KLRG1int/neg, CX3CR1int)' },
+                'CD8.K':  { state: 'act/exper',  previous: 'Similar to CD8.J with proliferating features (KLRG1int/neg, CX3CR1int)' },
+                'CD8.Q':  { state: 'act/exper',  previous: 'Trm and exhausted/dysfunctional (Trm-like) (Ly108-, CD39-, TIM3-)' },
+                'CD8.R':  { state: 'act/exper',  previous: 'exhausted/dysfunctional (Ly108-, CD39+, TIM3int)' },
+                'CD8.S':  { state: 'act/exper',  previous: 'terminally exhausted/dysfunctional (Ly108-, CD39+, TIM3+)' },
+                'CD8.T':  { state: 'act/exper',  previous: 'CD8ab+ gut intra-epithelial lymphocytes, IEL' },
+                'CD8.wU': { previous: 'provisional, unclear' },
+                'CD8.wV': { previous: 'provisional, unclear' },
+                'CD8.wX': { previous: 'provisional, unclear' },
+                'CD8.wY': { previous: 'provisional, unclear' },
+                'CD8.wM': { previous: 'miniverse' },
+                'CD8.P':  { previous: 'proliferating' },
+            };
+
+            function escapeHtml(value) {
+                return String(value).replace(/[&<>"']/g, ch => ({
+                    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+                }[ch]));
+            }
+
+            function formatTooltipHtml(text) {
+                const info = clusterInfo[text];
+                if (!info) return escapeHtml(text);
+                const lines = [`<span class="tip-label tip-cluster">immgenT clusters:</span> ${escapeHtml(text)}`];
+                if (info.state) lines.push(`<span class="tip-label tip-state">Rest/Act:</span> ${escapeHtml(info.state)}`);
+                if (info.previous) lines.push(`<span class="tip-label tip-prev">Previous subset names:</span> ${escapeHtml(info.previous)}`);
+                return lines.join('<br>');
+            }
+
             function showTooltip(event, text) {
-                tooltip.textContent = text;
+                tooltip.innerHTML = formatTooltipHtml(text);
                 tooltip.style.display = 'block';
                 moveTooltip(event);
             }
